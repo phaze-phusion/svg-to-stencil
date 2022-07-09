@@ -1,0 +1,9 @@
+@use 'sass:math';
+
+@mixin em-based-font-size( $size-in-pixels, $em-base: $font-size-base-pixels ) {
+  font-size: math.div(strip-unit($size-in-pixels), strip-unit($em-base)) * 1em;
+}
+
+@mixin em-based-line-height( $size-in-pixels, $fontsize-in-pixels: $font-size-base-pixels ) {
+  line-height: math.div(strip-unit($size-in-pixels), strip-unit($fontsize-in-pixels)) * 1em;
+}
