@@ -1,11 +1,19 @@
-export class Shape {
+export class PathToLinesClass {
   x = 0;
   y = 0;
   svgPath = '';
   mxGraph = '';
 
-  constructor(path) {
-    this.svgPath = (path.match(/d="([^"]+)"/)[1]);
+  constructor() {
+  }
+
+  convert(path) {
+    this.x = 0;
+    this.y = 0;
+    this.svgPath = '';
+    this.mxGraph = '';
+
+    this.svgPath = path;
 
     let safeBreak = 0;
     while (this.svgPath.length > 0) {
@@ -29,6 +37,8 @@ export class Shape {
       if (safeBreak > 100)
         break;
     }
+
+    return this.mxGraph.trim();
   }
 
   cutCharsFromFront(indexStart) {

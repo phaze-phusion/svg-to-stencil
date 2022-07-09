@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no">
-  <link href="img/favicon.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
   <title>SVG to Stencil</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,33 @@
 </head>
 <body>
 <main>
-  <label for="svg-in">SVG XML</label>
-  <textarea id="svg-in"></textarea>
-  <br>
-  <label for="mx-out">Pencil XML</label>
-  <textarea id="mx-out"></textarea>
+  <h1>SVG to Stencil <span id="app-version"></span></h1>
+  <h2>SVG XML</h2>
+  <div id="area-input" class="area-main">
+    <div class="area-l">
+      <textarea id="svg-in">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </textarea>
+      <label for="svg-in" class="help-text">paste SVG XML here</label>
+    </div>
+    <div class="area-r">
+    </div>
+  </div>
+  <button id="convert-btn" title="Click to convert"><span class="material-icons">arrow_downward</span></button>
+  <h2>Stencil XML</h2>
+  <div id="area-output" class="area-main">
+    <div class="area-l">
+      <textarea id="mx-out"></textarea>
+      <label for="mx-out" class="help-text">copy Pencil XML from here</label>
+    </div>
+    <div class="area-r">
+      <h3>Additional controls</h3>
+      <label>
+        <input type="checkbox" id="include-full" checked> Include all stencil tags
+
+      </label>
+    </div>
+  </div>
 </main>
 </body>
 </html>

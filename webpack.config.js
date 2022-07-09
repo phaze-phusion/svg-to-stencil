@@ -6,6 +6,7 @@ const path                 = require('path'),
       HtmlWebpackPlugin    = require('html-webpack-plugin'),
       CssMinimizerPlugin   = require('css-minimizer-webpack-plugin'),
       TerserPlugin         = require('terser-webpack-plugin'),
+      CopyPlugin           = require('copy-webpack-plugin'),
       {CleanWebpackPlugin} = require('clean-webpack-plugin'),
       StyleLintPlugin      = require('stylelint-webpack-plugin'),
       webpack              = require('webpack'),
@@ -25,8 +26,13 @@ module.exports = (env, argv) => {
       filename: `js/${packageName}.js`,
     },
     target: 'browserslist',
-    resolve: { extensions: ['.js'] },
-    stats: 'errors-warnings', // 'minimal,  'errors-only', // 'normal'
+    resolve: {
+      extensions: ['.js'],
+    },
+    stats: {
+      children: true,
+      // 'errors-warnings'
+    }, // 'minimal,  'errors-only', // 'normal'
     module: {
       rules: [
         {
@@ -70,17 +76,6 @@ module.exports = (env, argv) => {
           ],
         },
         {
-          // This loader is the one that auto-refreshes the browsers after an edit
-          test: /\.html$/,
-          use: [{
-            loader: 'html-loader',
-            options: {
-              // attrs: [':data-src'],
-              minimize: argv.mode === 'development',
-            },
-          }],
-        },
-        {
           test: /\.(svg|jpg|png|ico)$/i,
           use: [
             {
@@ -92,17 +87,6 @@ module.exports = (env, argv) => {
               }
             }
           ]
-        },
-        {
-          // This loader is the one that auto-refreshes the browsers after an edit
-          test: /\.html$/,
-          use: [{
-            loader: 'html-loader',
-            options: {
-              // attrs: [':data-src'],
-              minimize: argv.mode === 'development',
-            },
-          }],
         },
         {
           test: /\.js$/,
@@ -129,6 +113,8 @@ module.exports = (env, argv) => {
 
     // https://webpack.js.org/configuration/dev-server/
     config.devServer = {
+      hot: true,
+      watchFiles: ['src/**/*'],
       static: path.join(pathRoot, 'local'),
       host: 'localhost',
       port: 4400,
@@ -145,6 +131,7 @@ module.exports = (env, argv) => {
         chunkFilename: 'css/[id].css',
       }),
       new HtmlWebpackPlugin({
+        favicon: path.resolve(pathRoot, './src/favicon.ico'),
         inject: true,
         hash: false,
         minify: false,
@@ -223,16 +210,18 @@ module.exports = (env, argv) => {
         verbose: false,
         cleanOnceBeforeBuildPatterns: ['./**/*'], // clean out dist directory
       }),
-      new CopyPlugin({
-        patterns: [
-          { from: 'img/**/*', to: '../dist/', context: 'src/' },
-        ],
-      }),
+      // new CopyPlugin({
+      //   patterns: [
+      //     // { from: 'img/**/*', to: '../dist/', context: 'src/' },
+      //     { from: 'src/favicon.ico', to: '../dist/', context: 'src/' },
+      //   ],
+      // }),
       new MiniCssExtractPlugin({
         filename: `${packageName}.min.css`,
         chunkFilename: '[id].css',
       }),
       new HtmlWebpackPlugin({
+        favicon: path.resolve(pathRoot, './src/favicon.ico'),
         inject: false,
         hash: false,
         template: path.resolve(pathRoot, './src/index.html'),

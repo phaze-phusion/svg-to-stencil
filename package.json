@@ -14,6 +14,10 @@
     "prebuild": "run-p lint-scss lint-es -s"
   },
   "keywords": [],
+  "dependencies": {
+    "modern-normalize": "^1.1.0",
+    "svgson": "^5.2.1"
+  },
   "devDependencies": {
     "@babel/compat-data": "^7.18.8",
     "@babel/core": "^7.18.6",
@@ -22,6 +26,7 @@
     "babel-loader": "^8.2.5",
     "browserslist": "^4.21.1",
     "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
     "core-js": "^3.23.3",
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.4.1",
@@ -33,7 +38,6 @@
     "eslint-plugin-promise": "^6.0.0",
     "extract-css-chunks-webpack-plugin": "^4.9.0",
     "file-loader": "^6.2.0",
-    "html-loader": "^3.1.2",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.1",
     "npm-run-all": "^4.1.5",
