@@ -3,6 +3,7 @@ export class PathToLinesClass {
   y = 0;
   svgPath = '';
   mxGraph = '';
+  precision = 1e2;
 
   constructor() {
   }
@@ -59,15 +60,27 @@ export class PathToLinesClass {
     this.mxGraph += `<close/>\n`;
   }
 
+  fixOverflow(value) {
+    if ((value + '').length > 15) {
+      value = Math.round(value * this.precision) / this.precision;
+    }
+    return value;
+  }
+
   setCoordinates(x = null, y = null) {
-    if (x !== null)
-      this.x = x;
-    if (y !== null)
-      this.y = y;
+    if (x !== null) {
+      // if (isNaN(x)) {
+      //   console.log('NaN X', x)
+      // }
+      this.x = this.fixOverflow(x);
+    }
+    if (y !== null) {
+      this.y = this.fixOverflow(y);
+    }
   }
 
   get1Coordinate() {
-    const matches = this.svgPath.match(/[hv](-?[0-9\.]+)/i);
+    const matches = this.svgPath.match(/[hv](-?[0-9.]+)/i);
     const cutStartIndex = matches[0].length;
     // console.log('match 1', matches);
     // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
@@ -77,9 +90,18 @@ export class PathToLinesClass {
   }
 
   get2Coordinates() {
-    const matches = this.svgPath.match(/[ml](-?[0-9\.]+) ?(-?[0-9\.]+)/i);
+    const matches = this.svgPath.match(/[ml](-?[0-9.]+) ?(-?[0-9.]+)/i);
+    if (isNaN(+matches[1])) {
+      // second coordinate is a decimal without the preceding zero
+      const decimalSplit = matches[1].split('.');
+      if (decimalSplit.length === 3) {
+        matches[1] = `${decimalSplit[0]}.${decimalSplit[1]}`;
+        matches[2] = `${decimalSplit[2]}.${matches[2]}`;
+      }
+    }
+
     const cutStartIndex = matches[0].length;
-    // console.log('match 2', matches);
+    console.log('match 2', matches);
     // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
     this.cutCharsFromFront(cutStartIndex);
     // console.log('match 2 path', this.svgPath);

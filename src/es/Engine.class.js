@@ -31,7 +31,7 @@ export class EngineClass {
   }
 
   onConvert() {
-    parse(this.taInputEl.textContent)
+    parse(this.taInputEl.value)
       .then(
         (svgJson) => {
           this.svgObject = svgJson;
@@ -47,7 +47,7 @@ export class EngineClass {
                 break;
             }
           }
-          console.log(svgJson);
+          // console.log(svgJson);
         }
       )
       .finally(
@@ -56,7 +56,7 @@ export class EngineClass {
           if (pickById('include-full').checked) {
             this.stencilContent = `<shape w="${this.svgObject.attributes.width}" `
               + `h="${this.svgObject.attributes.height}" `
-              + `aspect="variable" strokewidth="inherit">\n`
+              + `aspect="fixed" strokewidth="inherit">\n`
               + `  <connections />\n  <background>\n    <fillstroke />\n  </background>\n`
               + `  <foreground>\n    `
               + this.stencilForegroundContent.replace(/\n/g, '\n    ')
