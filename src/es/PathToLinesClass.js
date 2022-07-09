@@ -21,16 +21,21 @@ export class PathToLinesClass {
       const char = this.svgPath[0];
       // console.log('loop ALPHA', char, ' - ', this.svgPath);
       switch (char) {
-        case 'M': this.path_M(); break;
-        case 'L': this.path_L(); break;
-        case 'H': this.path_H(); break;
-        case 'V': this.path_V(); break;
-        case 'm': this.path_m(); break;
-        case 'l': this.path_l(); break;
-        case 'h': this.path_h(); break;
-        case 'v': this.path_v(); break;
+        // Move
+        case 'M': this.path_M(false); break;
+        case 'm': this.path_M(true); break;
+        // Line
+        case 'L': this.path_L(false); break;
+        case 'l': this.path_L(true); break;
+        // Horizontal line
+        case 'H': this.path_H(false); break;
+        case 'h': this.path_H(true); break;
+        // Vertical line
+        case 'V': this.path_V(false); break;
+        case 'v': this.path_V(true); break;
+        // End path
         case 'Z':
-        case 'z': this.path_z(); break;
+        case 'z': this.path_Z(); break;
       }
       // console.log('loop OMEGA', char, ' - ', this.svgPath);
 
@@ -67,11 +72,23 @@ export class PathToLinesClass {
     return value;
   }
 
+  fixLeadingZeroMatches(matches) {
+    for (let beer = 1; beer < matches.length; beer++) {
+      // Check for NaN
+      if (isNaN(+matches[beer])) {
+        // next coordinate is a decimal without the preceding zero
+        const decimalSplit = matches[beer].split('.');
+        if (decimalSplit.length === 3) {
+          matches[beer] = `${decimalSplit[0]}.${decimalSplit[1]}`;
+          matches[beer + 1] = `.${decimalSplit[2]}${matches[beer + 1]}`;
+        }
+      }
+    }
+    return matches;
+  }
+
   setCoordinates(x = null, y = null) {
     if (x !== null) {
-      // if (isNaN(x)) {
-      //   console.log('NaN X', x)
-      // }
       this.x = this.fixOverflow(x);
     }
     if (y !== null) {
@@ -90,18 +107,11 @@ export class PathToLinesClass {
   }
 
   get2Coordinates() {
-    const matches = this.svgPath.match(/[ml](-?[0-9.]+) ?(-?[0-9.]+)/i);
-    if (isNaN(+matches[1])) {
-      // second coordinate is a decimal without the preceding zero
-      const decimalSplit = matches[1].split('.');
-      if (decimalSplit.length === 3) {
-        matches[1] = `${decimalSplit[0]}.${decimalSplit[1]}`;
-        matches[2] = `${decimalSplit[2]}.${matches[2]}`;
-      }
-    }
+    let matches = this.svgPath.match(/[ml](-?[0-9.]+) ?(-?[0-9.]+)/i);
+    matches = this.fixLeadingZeroMatches(matches);
 
     const cutStartIndex = matches[0].length;
-    console.log('match 2', matches);
+    // console.log('match 2', matches);
     // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
     this.cutCharsFromFront(cutStartIndex);
     // console.log('match 2 path', this.svgPath);
@@ -111,55 +121,45 @@ export class PathToLinesClass {
     };
   }
 
-  path_M() {
+  path_M(isRelative) {
     const coords = this.get2Coordinates();
+    if (isRelative) {
+      coords.x += this.x;
+      coords.y += this.y;
+    }
     this.setCoordinates(coords.x, coords.y);
     this.mxAppendMove();
   }
 
-  path_L() {
+  path_L(isRelative) {
     const coords = this.get2Coordinates();
+    if (isRelative) {
+      coords.x += this.x;
+      coords.y += this.y;
+    }
     this.setCoordinates(coords.x, coords.y);
     this.mxAppendLine();
   }
 
-  path_H() {
-    const x = this.get1Coordinate();
+  path_H(isRelative) {
+    let x = this.get1Coordinate();
+    if (isRelative) {
+      x += this.x;
+    }
     this.setCoordinates(x, null);
     this.mxAppendLine();
   }
 
-  path_V() {
-    const y = this.get1Coordinate();
+  path_V(isRelative) {
+    let y = this.get1Coordinate();
+    if (isRelative) {
+      y += this.y;
+    }
     this.setCoordinates(null, y);
     this.mxAppendLine();
   }
 
-  path_m() {
-    const coords = this.get2Coordinates();
-    this.setCoordinates(this.x + coords.x, this.y + coords.y);
-    this.mxAppendMove();
-  }
-
-  path_l() {
-    const coords = this.get2Coordinates();
-    this.setCoordinates(this.x + coords.x, this.y + coords.y);
-    this.mxAppendLine();
-  }
-
-  path_h() {
-    const x = this.get1Coordinate();
-    this.setCoordinates(this.x + x, null);
-    this.mxAppendLine();
-  }
-
-  path_v() {
-    const y = this.get1Coordinate();
-    this.setCoordinates(null, this.y + y);
-    this.mxAppendLine();
-  }
-
-  path_z() {
+  path_Z() {
     this.cutCharsFromFront(1);
     this.mxAppendClose()
   }
