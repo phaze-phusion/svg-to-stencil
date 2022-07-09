@@ -33,6 +33,12 @@ export class PathToLinesClass {
         // Vertical line
         case 'V': this.path_V(false); break;
         case 'v': this.path_V(true); break;
+        // Arc
+        case 'A': this.path_A(false); break;
+        case 'a': this.path_A(true); break;
+        // Curve
+        case 'C': this.path_C(false); break;
+        case 'c': this.path_C(true); break;
         // End path
         case 'Z':
         case 'z': this.path_Z(); break;
@@ -158,6 +164,84 @@ export class PathToLinesClass {
     this.setCoordinates(null, y);
     this.mxAppendLine();
   }
+
+  path_A(isRelative) {
+    // match 1 -> radius x
+    // match 2 -> radius y
+    // match 3 -> tilt degrees
+    // match 4 -> large-arc-flag
+    // match 5 -> sweep-flag
+    // match 6 -> end x
+    // match 7 -> end y
+    const matches = this.svgPath.match(/[aA]([0-9]+) ([0-9]+) (-?[0-9.]+) ([01]) ([01]) ?(-?[0-9.]+) ?(-?[0-9.]+)/);
+    // console.log('match A', matches);
+    const cutStartIndex = matches[0].length;
+    this.cutCharsFromFront(cutStartIndex);
+    // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
+    // console.log('match A path', this.svgPath);
+    const coords = {
+      x: +matches[6],
+      y: +matches[7],
+    }
+
+    if (isRelative) {
+      coords.x += this.x;
+      coords.y += this.y;
+    }
+    this.setCoordinates(coords.x, coords.y);
+
+    this.mxGraph += `<arc `
+      + `rx="${matches[1]}" ry="${matches[2]}" `
+      + `x-axis-rotation="${matches[3]}" `
+      + `large-arc-flag="${matches[4]}" `
+      + `sweep-flag="${matches[5]}" `
+      + `x="${this.x}" y="${this.y}"/>\n`
+  }
+
+  path_C(isRelative) {
+    // c dx1 dy1, dx2 dy2, dx dy
+
+    // match 1 -> x1
+    // match 2 -> y1
+    // match 3 -> x2
+    // match 4 -> y2
+    // match 5 -> end x
+    // match 6 -> end y
+    let matches = this.svgPath.match(/[cC](-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+)/);
+    matches = this.fixLeadingZeroMatches(matches);
+    const cutStartIndex = matches[0].length;
+    this.cutCharsFromFront(cutStartIndex);
+
+    // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
+    // console.log('match C path', this.svgPath);
+    const coords = {
+      x1: +matches[1],
+      y1: +matches[2],
+      x2: +matches[3],
+      y2: +matches[4],
+      x: +matches[5],
+      y: +matches[6],
+    }
+
+    // console.table(coords);
+
+    if (isRelative) {
+      coords.x1 = this.fixOverflow(this.x + coords.x1);
+      coords.y1 = this.fixOverflow(this.y + coords.y1);
+      coords.x2 = this.fixOverflow(this.x + coords.x2);
+      coords.y2 = this.fixOverflow(this.y + coords.y2);
+      coords.x = this.fixOverflow(this.x + coords.x);
+      coords.y = this.fixOverflow(this.y + coords.y);
+    }
+
+    this.setCoordinates(coords.x, coords.y);
+
+    this.mxGraph += `<curve `
+      + `x1="${coords.x1}" y1="${coords.y1}" `
+      + `x2="${coords.x2}" y2="${coords.y2}" `
+      + `x3="${coords.x}" y3="${coords.y}"/>\n`
+  }
+
 
   path_Z() {
     this.cutCharsFromFront(1);
