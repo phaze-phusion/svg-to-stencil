@@ -112,12 +112,13 @@ export class PathToLinesClass {
   }
 
   get1Coordinate() {
+    // console.log('match 1 path before', this.svgPath);
     const matches = this.svgPath.match(/[hv](-?[0-9.]+)/i);
     const cutStartIndex = matches[0].length;
     // console.log('match 1', matches);
     // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
     this.cutCharsFromFront(cutStartIndex);
-    // console.log('match 1 path', this.svgPath);
+    // console.log('match 1 path after', this.svgPath);
     return +matches[1];
   }
 
@@ -182,28 +183,37 @@ export class PathToLinesClass {
     // match 5 -> sweep-flag
     // match 6 -> end x
     // match 7 -> end y
-    const matches = this.svgPath.match(/[aA]([0-9.]+) ([0-9.]+) (-?[0-9.]+) ([01]) ([01]) ?(-?[0-9.]+) ?(-?[0-9.]+)/);
-    // console.log('match A', matches);
+    // let matches = this.svgPath.match(/[aA](-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ([01]) ([01]) ?(-?[0-9.]+) ?(-?[0-9.]+)/);
+    let matches = this.svgPath.match(/[aA](-?[0-9.]+)([- .][0-9.]+)([- .][0-9.]+) ([01]) ([01])([- .][0-9.]+)([- .][0-9.]+)/);
+    console.log('match A', matches);
+    matches = this.fixLeadingZeroMatches(matches);
     const cutStartIndex = matches[0].length;
     this.cutCharsFromFront(cutStartIndex);
     // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
     // console.log('match A path', this.svgPath);
     const coords = {
+      rx: +matches[1],
+      ry: +matches[2],
+      dg: +matches[3],
+      af: matches[4].trim(),
+      sf: matches[5].trim(),
       x: +matches[6],
       y: +matches[7],
     }
 
     if (isRelative) {
-      coords.x += this.x;
-      coords.y += this.y;
+      coords.rx = fixFloatOverflow(this.x + coords.rx);
+      coords.ry = fixFloatOverflow(this.y + coords.ry);
+      coords.x = fixFloatOverflow(this.x + coords.x);
+      coords.y = fixFloatOverflow(this.y + coords.y);
     }
     this.setCoordinates(coords.x, coords.y);
 
     this.mxGraph += `<arc `
-      + `rx="${matches[1]}" ry="${matches[2]}" `
-      + `x-axis-rotation="${matches[3]}" `
-      + `large-arc-flag="${matches[4]}" `
-      + `sweep-flag="${matches[5]}" `
+      + `rx="${coords.rx}" ry="${coords.ry}" `
+      + `x-axis-rotation="${coords.dg}" `
+      + `large-arc-flag="${coords.af}" `
+      + `sweep-flag="${coords.sf}" `
       + `x="${this.x}" y="${this.y}"/>\n`
   }
 
@@ -344,7 +354,6 @@ export class PathToLinesClass {
     //   + `x2="${coords.x2}" y2="${coords.y2}" `
     //   + `x3="${coords.x}" y3="${coords.y}"/>\n`
   }
-
 
   path_Z() {
     this.cutCharsFromFront(1);
