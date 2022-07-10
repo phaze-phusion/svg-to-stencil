@@ -1,3 +1,5 @@
+import {fixFloatOverflow} from "./utlis";
+
 export class PathToLinesClass {
   x = 0;
   y = 0;
@@ -5,7 +7,6 @@ export class PathToLinesClass {
   nextSy2 = 0;
   svgPath = '';
   mxGraph = '';
-  precision = 1e2;
 
   constructor() {
   }
@@ -76,13 +77,6 @@ export class PathToLinesClass {
     this.mxGraph += `<close/>\n`;
   }
 
-  fixOverflow(value) {
-    if ((value + '').length > 15) {
-      value = Math.round(value * this.precision) / this.precision;
-    }
-    return value;
-  }
-
   fixLeadingZeroMatches(matches) {
     for (let beer = 1; beer < matches.length; beer++) {
       // Check for NaN
@@ -101,10 +95,10 @@ export class PathToLinesClass {
 
   setCoordinates(x = null, y = null) {
     if (x !== null) {
-      this.x = this.fixOverflow(x);
+      this.x = fixFloatOverflow(x);
     }
     if (y !== null) {
-      this.y = this.fixOverflow(y);
+      this.y = fixFloatOverflow(y);
     }
   }
 
@@ -219,12 +213,12 @@ export class PathToLinesClass {
     // console.table(coords);
 
     if (isRelative) {
-      coords.x1 = this.fixOverflow(this.x + coords.x1);
-      coords.y1 = this.fixOverflow(this.y + coords.y1);
-      coords.x2 = this.fixOverflow(this.x + coords.x2);
-      coords.y2 = this.fixOverflow(this.y + coords.y2);
-      coords.x = this.fixOverflow(this.x + coords.x);
-      coords.y = this.fixOverflow(this.y + coords.y);
+      coords.x1 = fixFloatOverflow(this.x + coords.x1);
+      coords.y1 = fixFloatOverflow(this.y + coords.y1);
+      coords.x2 = fixFloatOverflow(this.x + coords.x2);
+      coords.y2 = fixFloatOverflow(this.y + coords.y2);
+      coords.x = fixFloatOverflow(this.x + coords.x);
+      coords.y = fixFloatOverflow(this.y + coords.y);
     }
 
     // Used to fake a matrix conversion for s-curves
@@ -326,12 +320,12 @@ export class PathToLinesClass {
     // // console.table(coords);
     //
     // if (isRelative) {
-    //   coords.x1 = this.fixOverflow(this.x + coords.x1);
-    //   coords.y1 = this.fixOverflow(this.y + coords.y1);
-    //   coords.x2 = this.fixOverflow(this.x + coords.x2);
-    //   coords.y2 = this.fixOverflow(this.y + coords.y2);
-    //   coords.x = this.fixOverflow(this.x + coords.x);
-    //   coords.y = this.fixOverflow(this.y + coords.y);
+    //   coords.x1 = fixFloatOverflow(this.x + coords.x1);
+    //   coords.y1 = fixFloatOverflow(this.y + coords.y1);
+    //   coords.x2 = fixFloatOverflow(this.x + coords.x2);
+    //   coords.y2 = fixFloatOverflow(this.y + coords.y2);
+    //   coords.x = fixFloatOverflow(this.x + coords.x);
+    //   coords.y = fixFloatOverflow(this.y + coords.y);
     // }
     //
     // this.setCoordinates(coords.x, coords.y);

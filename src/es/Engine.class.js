@@ -1,5 +1,5 @@
 import {PathToLinesClass} from "./PathToLinesClass";
-import {pickById} from "./utlis";
+import {fixFloatOverflow, pickById} from "./utlis";
 import {parse, INode} from 'svgson';
 
 export class EngineClass {
@@ -45,10 +45,22 @@ export class EngineClass {
             const svgChild = svgJson.children[know];
             switch (svgChild.name) {
               case 'path':
-                this.stencilForegroundContent = `<path>\n  `
+                this.stencilForegroundContent += `<path>\n  `
                   + this._pathToLine.convert(svgChild.attributes.d).split('\n').join('\n  ')
                   + `\n</path>\n`
+                  + `<fillstroke/>\n`;
+                break;
+              case 'circle':
+                const ellipseW = fixFloatOverflow(svgChild.attributes.r * 2);
+                const ellipseX = fixFloatOverflow(svgChild.attributes.cx - svgChild.attributes.r);
+                const ellipseY = fixFloatOverflow(svgChild.attributes.cy - svgChild.attributes.r);
+                this.stencilForegroundContent += `<ellipse `
+                  + `w="${ellipseW}" `
+                  + `h="${ellipseW}" `
+                  + `x="${ellipseX}" `
+                  + `y="${ellipseY}" />\n`
                   + `<fillstroke/>`;
+                console.log(svgChild);
                 break;
             }
           }
