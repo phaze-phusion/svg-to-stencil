@@ -81,13 +81,22 @@ export class PathToLinesClass {
     for (let beer = 1; beer < matches.length; beer++) {
       // Check for NaN
       if (isNaN(+matches[beer])) {
+        // console.log('matches before', matches);
         // next coordinate is a decimal without the preceding zero
         const decimalSplit = matches[beer].split('.');
+        // console.log('decimalSplit', decimalSplit);
         if (decimalSplit.length === 3) {
           matches[beer] = `${decimalSplit[0]}.${decimalSplit[1]}`;
           matches.splice(beer + 1, 0, `.${decimalSplit[2]}`);
           // matches[beer + 1] = `.${decimalSplit[2]}.${matches[beer + 1]}`;
         }
+        // console.log('matches after', matches);
+      } else if (matches[beer].substring(matches[beer].length - 1, matches[beer].length) === '.') {
+        // console.log('last dot before', matches);
+        // trailing dot clearly means this match was cut up
+        matches[beer] = matches[beer] + matches[beer + 1];
+        matches.splice(beer + 1, 1); // remove the match that has been joined with the previous match
+        // console.log('last dot after', matches);
       }
     }
     return matches;

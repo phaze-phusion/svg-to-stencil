@@ -31,6 +31,7 @@ export class EngineClass {
   }
 
   onConvert() {
+    this.stencilForegroundContent = '';
     parse(this.taInputEl.value)
       .then(
         (svgJson) => {
@@ -48,7 +49,7 @@ export class EngineClass {
                 this.stencilForegroundContent += `<path>\n  `
                   + this._pathToLine.convert(svgChild.attributes.d).split('\n').join('\n  ')
                   + `\n</path>\n`
-                  + `<fillstroke/>\n`;
+                  + `<fillstroke/>`;
                 break;
               case 'circle':
                 const ellipseW = fixFloatOverflow(svgChild.attributes.r * 2);
@@ -67,6 +68,10 @@ export class EngineClass {
               case 'polyline':
               case 'polygon':
               default: console.error(`Engine doesn't yet cater for "${svgChild.name}"`, svgChild);
+            }
+
+            if ((know + 1) < svgJson.children.length) {
+              this.stencilForegroundContent += '\n'
             }
           }
         }
