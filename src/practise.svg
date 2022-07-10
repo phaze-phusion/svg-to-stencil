@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <g transform="translate(-50, -50)">
+    <path d="
+    M 100 100
+    c 25 25 75 25 100 0
+    s 25 125 0 100 -75 -25 -100 0
+" stroke="#f00" stroke-width="2" fill="none"/>
+    <path d="
+    M 250 100
+    c 20 20 80 40 100 0
+    s 100 10 0 100
+     -150 -50 -100 0
+" stroke="#00c" stroke-width="2" fill="none"/>
+  </g>
+  <g transform="translate(-50, 100)">
+<!--<path d="M 100 100 C 125 125 175 125 200 100 s 25 125 0 100 -75 -25 -100 0" stroke="#000" stroke-width="2" fill="none"/>-->
+<!--<path d="
+    M 100, 100
+    c  25,  25,   75,  25, 100,   0
+    s  25, 125,    0, 100,
+      -75, -25, -100,   0
+" stroke="#000" stroke-width="2" fill="none"/>-->
+<!--<path d="
+    M 100, 100
+    C 125, 125, 175, 125, 200, 100
+    C 225,  75, 225, 225, 200, 200
+    C 175, 175, 125, 175, 100, 200
+" stroke="#000" stroke-width="2" fill="none"/>-->
+<path d="
+    M 100, 100
+    C 125, 125, 175, 125,  200, 100
+    c  25, -25,  25, 125,    0, 100
+    c -25, -25, -75, -25, -100,   0
+" stroke="#0c0" stroke-width="2" fill="none"/>
+
+<path d="
+    M 250, 100
+    C 270, 120, 330, 140,  350, 100
+    c  20, -40,  100, 10,    0, 100
+    c -100, 90, -150, -50,  -100, 0
+" stroke="#000" stroke-width="2" fill="none"/>
+  </g>
+
+
+  <!--
+  C cx1 cy1 cx2 cy2 cxe cye
+  S sx1 sy1 sxe sye
+
+  C -> (cxe - cx2), (cye - cy2), sx1, sy1, sxe, sye
+  C -> (cxe - cx2), (cye - cy2), sx1, sy1, sxe, sye
+
+  -->
+</svg>
