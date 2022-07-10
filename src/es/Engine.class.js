@@ -60,8 +60,13 @@ export class EngineClass {
                   + `x="${ellipseX}" `
                   + `y="${ellipseY}" />\n`
                   + `<fillstroke/>`;
-                console.log(svgChild);
                 break;
+              case 'rect':
+              case 'ellipse':
+              case 'line':
+              case 'polyline':
+              case 'polygon':
+              default: console.error(`Engine doesn't yet cater for "${svgChild.name}"`, svgChild);
             }
           }
         }
