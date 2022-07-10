@@ -34,7 +34,12 @@ export class EngineClass {
     parse(this.taInputEl.value)
       .then(
         (svgJson) => {
+          // When 2 or more svg objects are present
+          if (svgJson instanceof Array)
+            svgJson = svgJson[0];
+
           this.svgObject = svgJson;
+          // console.log(svgJson);
 
           for (let know = 0; know < svgJson.children.length; know++) {
             const svgChild = svgJson.children[know];
@@ -47,7 +52,6 @@ export class EngineClass {
                 break;
             }
           }
-          // console.log(svgJson);
         }
       )
       .finally(
