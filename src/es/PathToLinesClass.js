@@ -66,19 +66,15 @@ export class PathToLinesClass {
     return this.mxGraph.trim();
   }
 
-  cutCharsFromFront(indexStart) {
-    this.svgPath = this.svgPath.substring(indexStart);
-  }
-
-  setCoordinates(x = null, y = null) {
-    if (x !== null) {
-      this.x = fixFloatOverflow(x);
-    }
-    if (y !== null) {
-      this.y = fixFloatOverflow(y);
-    }
-  }
-
+  /**
+   * Handle SVG LineTo paths m/M, l/L, h/H, v/V
+   *
+   * @param {string} forPath
+   * @param {boolean} isRelative
+   * @param {string} penDown
+   *
+   * @see https://www.w3.org/TR/SVG/paths.html#PathDataLinetoCommands
+   */
   path_basic(forPath, isRelative, penDown = true) {
     let matches;
     let x = null;
@@ -131,6 +127,7 @@ export class PathToLinesClass {
    *    a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#arcs
+   * @see https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
    *
    * @param {boolean} isRelative
    */
@@ -216,6 +213,7 @@ export class PathToLinesClass {
    *    c dx1 dy1 dx2 dy2 dx dy
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
+   * @see https://www.w3.org/TR/SVG/paths.html#PathDataCubicBezierCommands
    *
    * @param {boolean} isRelative
    */
@@ -240,6 +238,7 @@ export class PathToLinesClass {
    *    s dx2 dy2 dx dy
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
+   * @see https://www.w3.org/TR/SVG/paths.html#PathDataCubicBezierCommands
    *
    * @param {boolean} isRelative
    */
@@ -297,6 +296,31 @@ export class PathToLinesClass {
     return valueArr;
   }
 
+  /**
+   * Remove strings from front of working SVG path
+   * @param {number} indexStart
+   */
+  cutCharsFromFront(indexStart) {
+    this.svgPath = this.svgPath.substring(indexStart);
+  }
+
+  /**
+   * Set the X and Y coordinates to use in relative calculations
+   * @param {number} [x=null]
+   * @param {number} [y=null]
+   */
+  setCoordinates(x = null, y = null) {
+    if (x !== null) {
+      this.x = fixFloatOverflow(x);
+    }
+    if (y !== null) {
+      this.y = fixFloatOverflow(y);
+    }
+  }
+
+  /**
+   * Handle SVG close path z/Z
+   */
   path_Z() {
     this.cutCharsFromFront(1);
     this.mxGraph += `<close/>\n`;
