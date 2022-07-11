@@ -3,9 +3,11 @@ import {fixFloatOverflow} from "./utlis";
 const pathMatchesPerValue = 4; // From the regex a value can come from 3 separate match indexes
 const pathFirst = '((-?\\.\\d+)|(-?\\d+\\.\\d+)|(-?\\d+))';
 const pathRest  = '(([- ]?\\.\\d+)|([- ]\\d+\\.\\d+)|([- ]\\d+))';
-const arcFlag = ' (([01])(.?)(.?))'; // (.?) is used to fill up the matches to the same length as the rest
+const arcFlag = ' (([01])|(W)|(W))'; // (W) is used to fill up the matches to the same length as the rest
 const regexPathCubicCurve = new RegExp('^[cC]' + pathFirst + pathRest.repeat(5));
 const regexPathArc = new RegExp('^[aA]' + pathFirst + pathRest.repeat(2) + arcFlag.repeat(2) + pathRest.repeat(2));
+const regexPathLine = new RegExp('^[lmLM]' + pathFirst + pathRest);
+const regexPathSingle = new RegExp('^[hvHV]' + pathFirst);
 
 export class PathToLinesClass {
   x = 0;
@@ -68,61 +70,6 @@ export class PathToLinesClass {
     this.svgPath = this.svgPath.substring(indexStart);
   }
 
-  fixLeadingZeroMatches(matches) {
-
-    // start at index 1 as 0 is the whole string that was matched
-    for (let kudu = 1; kudu < matches.length; kudu++) {
-      // 2 or more decimals in a group will cause a NaN when converted to a number
-      if (isNaN(+matches[kudu])) {
-        console.log('matches before', matches);
-
-        // If the match only contains a decimal point
-        if (matches[kudu] === '.') {
-          // TODO: Finish thought process
-        }
-
-
-        // when 2 or more numbers are joined by decimal points it
-        // means they're all fractions and the leading zero was omitted
-        // example: "-.11.35.03.74"
-        if (matches[kudu].substring(0, 1) === '.' || matches[kudu].substring(0, 2) === '-.') {
-          const fractions = matches[kudu].split('.');
-          let matchesInsertionPoint = kudu + 1;
-
-          // Join the first 2 fraction parts with a decimal as they're part of the same number (eg "-" and "11)
-          // and splice them into the matches array right after the one we're working on
-          matches.splice(matchesInsertionPoint, 0, `${fractions[0]}.${fractions[1]}`);
-
-          // For the rest of the fraction parts, prepend a decimal point
-          // and splice them into the matches array one after the other
-          for (let aardvark = 2; aardvark < fractions.length; aardvark++) {
-            matchesInsertionPoint++;
-            matches.splice(matchesInsertionPoint, 0, `.${fractions[aardvark]}`);
-          }
-
-          // lastly remove the original match that we just worked on
-          matches.splice(kudu, 1);
-        }
-
-        // // next coordinate is a decimal without the preceding zero
-        // const decimalSplit = matches[kudu].split('.');
-        // // console.log('decimalSplit', decimalSplit);
-        // if (decimalSplit.length === 3) {
-        //   matches[kudu] = `${decimalSplit[0]}.${decimalSplit[1]}`;
-        //   matches.splice(kudu + 1, 0, `.${decimalSplit[2]}`);
-        // }
-        // console.log('matches after', matches);
-      } else if (matches[kudu].substring(matches[kudu].length - 1, matches[kudu].length) === '.') {
-        // console.log('last dot before', matches);
-        // trailing dot clearly means this match was cut up
-        matches[kudu] = matches[kudu] + matches[kudu + 1];
-        matches.splice(kudu + 1, 1); // remove the match that has been joined with the previous match
-        // console.log('last dot after', matches);
-      }
-    }
-    return matches;
-  }
-
   setCoordinates(x = null, y = null) {
     if (x !== null) {
       this.x = fixFloatOverflow(x);
@@ -138,10 +85,12 @@ export class PathToLinesClass {
     let y = null;
 
     if (forPath === 'm' || forPath === 'l') {
-      matches = this.svgPath.match(/[ml](-?[0-9.]+) ?(-?[0-9.]+)/i);
-      matches = this.fixLeadingZeroMatches(matches);
-      x = +matches[1];
-      y = +matches[2];
+      matches = this.svgPath.match(regexPathLine);
+      const values = this.valueInMultipleMatches(matches, pathMatchesPerValue);
+      // console.log('lineMatches', values);
+
+      x = values[0];
+      y = values[1];
 
       if (isRelative) {
         x += this.x;
@@ -149,23 +98,22 @@ export class PathToLinesClass {
       }
 
     } else if (forPath === 'h' || forPath === 'v') {
-      matches = this.svgPath.match(/[hv](-?[0-9.]+)/i);
+      matches = this.svgPath.match(regexPathSingle);
+      const values = this.valueInMultipleMatches(matches, pathMatchesPerValue);
+      // console.log('singleMatches', matches);
+      // console.log('singleValues', values);
 
       if (forPath === 'h') {
-        x = +matches[1] + (isRelative ? this.x : 0);
+        x = values[0] + (isRelative ? this.x : 0);
       } else { // if (forPath === 'v')
-        y = +matches[1] + (isRelative ? this.y : 0);
+        y = values[0] + (isRelative ? this.y : 0);
       }
     } else {
       throw new Error('Method only caters for paths m, l, v and h');
     }
 
     this.setCoordinates(x, y);
-
-    const cutStartIndex = matches[0].length;
-    // console.log('coords matches', matches);
-    // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
-    this.cutCharsFromFront(cutStartIndex);
+    this.cutCharsFromFront(matches[0].length);
     // console.log('coords path', this.svgPath);
 
     if (penDown) {
@@ -192,6 +140,7 @@ export class PathToLinesClass {
     this.cutCharsFromFront(arcMatches[0].length);
     const values = this.valueInMultipleMatches(arcMatches, pathMatchesPerValue);
     // console.log('arcMatches', arcMatches);
+    // console.log('arcValues', values);
 
     /** @type {{rx: number, ry: number, deg: number, af: number, sf: number, x: number, y: number }} */
     const coords = {};
@@ -200,8 +149,8 @@ export class PathToLinesClass {
     }
 
     if (isRelative) {
-      coords.rx = fixFloatOverflow(this.x + coords.rx);
-      coords.ry = fixFloatOverflow(this.y + coords.ry);
+      // coords.rx = fixFloatOverflow(this.x + coords.rx);
+      // coords.ry = fixFloatOverflow(this.y + coords.ry);
       coords.x = fixFloatOverflow(this.x + coords.x);
       coords.y = fixFloatOverflow(this.y + coords.y);
     }
