@@ -1,3 +1,31 @@
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <style type="text/css">
+    .p{fill:none; stroke-width:5;}
+    .e{fill:none; stroke-width:2; stroke: #666;}
+    .o{fill:none; stroke-width:1; stroke: #999;}
+  </style>
+
+  <path class="e" d="M0 100L500 100zM0 200L500 200zM0 300L500 300zM0 400L500 400z" />
+  <path class="o" d="M0 50L500 50zM0 150L500 150zM0 250L500 250zM0 350L500 350zM0 450L500 450z" />
+
+  <path class="p" stroke="#090"
+        d="M100 100 C100 200 250 200 250 100
+                    S400 0 400 100" />
+  <path class="p" stroke="#009" transform="translate(0, 50)"
+        d="M100 100 C100 200 250 200 250 100
+                    s150 -100 150 0" />
+  <path class="p" stroke="#909" transform="translate(0, 100)"
+        d="M100 100 C100 200 250 200 250 100
+                    c0 -100 150 -100 150 0" />
+  <!--<path class="p" stroke="#f00"
+        d="M100,200 C100 300 250 300 250 200
+                    S400 100 400 200" />
+  <path class="p" stroke="#90c" transform="translate(0, 50)"
+        d="M100,200 C100 300 250 300 250 200
+                    C250 100 400 100 400 200" />-->
+</svg>
+
+<!--
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
   <g transform="translate(-50, -50)">
     <path d="
@@ -13,19 +41,19 @@
 " stroke="#00c" stroke-width="2" fill="none"/>
   </g>
   <g transform="translate(-50, 100)">
-<!--<path d="M 100 100 C 125 125 175 125 200 100 s 25 125 0 100 -75 -25 -100 0" stroke="#000" stroke-width="2" fill="none"/>-->
-<!--<path d="
+&lt;!&ndash;<path d="M 100 100 C 125 125 175 125 200 100 s 25 125 0 100 -75 -25 -100 0" stroke="#000" stroke-width="2" fill="none"/>&ndash;&gt;
+&lt;!&ndash;<path d="
     M 100, 100
     c  25,  25,   75,  25, 100,   0
     s  25, 125,    0, 100,
       -75, -25, -100,   0
-" stroke="#000" stroke-width="2" fill="none"/>-->
-<!--<path d="
+" stroke="#000" stroke-width="2" fill="none"/>&ndash;&gt;
+&lt;!&ndash;<path d="
     M 100, 100
     C 125, 125, 175, 125, 200, 100
     C 225,  75, 225, 225, 200, 200
     C 175, 175, 125, 175, 100, 200
-" stroke="#000" stroke-width="2" fill="none"/>-->
+" stroke="#000" stroke-width="2" fill="none"/>&ndash;&gt;
 <path d="
     M 100, 100
     C 125, 125, 175, 125,  200, 100
@@ -42,12 +70,12 @@
   </g>
 
 
-  <!--
+  &lt;!&ndash;
   C cx1 cy1 cx2 cy2 cxe cye
   S sx1 sy1 sxe sye
 
   C -> (cxe - cx2), (cye - cy2), sx1, sy1, sxe, sye
   C -> (cxe - cx2), (cye - cy2), sx1, sy1, sxe, sye
 
-  -->
-</svg>
+  &ndash;&gt;
+</svg>-->

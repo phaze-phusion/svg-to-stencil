@@ -16,6 +16,7 @@ export class PathToLinesClass {
   nextDeltaY1 = 0;
   svgPath = '';
   mxGraph = '';
+  isRelative = null;
 
   constructor() {
   }
@@ -29,29 +30,32 @@ export class PathToLinesClass {
 
     for (let safeBreak = 0; safeBreak < 50 && this.svgPath.length > 0; safeBreak++) {
       const char = this.svgPath[0];
+
+      this.isRelative = char.match(/[mlhvacsz]/) !== null;
+
       // console.log('loop ALPHA', char, ' - ', this.svgPath);
       switch (char) {
         // Move
-        case 'M': this.path_basic('m', false, false); break;
-        case 'm': this.path_basic('m', true, false); break;
+        case 'M': this.path_basic('m', false); break;
+        case 'm': this.path_basic('m', false); break;
         // Line
-        case 'L': this.path_basic('l', false); break;
-        case 'l': this.path_basic('l', true); break;
+        case 'L': this.path_basic('l'); break;
+        case 'l': this.path_basic('l'); break;
         // Horizontal line
-        case 'H': this.path_basic('h', false); break;
-        case 'h': this.path_basic('h', true); break;
+        case 'H': this.path_basic('h'); break;
+        case 'h': this.path_basic('h'); break;
         // Vertical line
-        case 'V': this.path_basic('v', false); break;
-        case 'v': this.path_basic('v', true); break;
+        case 'V': this.path_basic('v'); break;
+        case 'v': this.path_basic('v'); break;
         // Arc
-        case 'A': this.path_A(false); break;
-        case 'a': this.path_A(true); break;
+        case 'A': this.path_A(); break;
+        case 'a': this.path_A(); break;
         // Cubic Curve
-        case 'C': this.path_C(false); break;
-        case 'c': this.path_C(true); break;
+        case 'C': this.path_C(); break;
+        case 'c': this.path_C(); break;
         // Curve
-        case 'S': this.path_S(false); break;
-        case 's': this.path_S(true); break;
+        case 'S': this.path_S(); break;
+        case 's': this.path_S(); break;
         // End path
         case 'Z':
         case 'z': this.path_Z(); break;
@@ -70,12 +74,11 @@ export class PathToLinesClass {
    * Handle SVG LineTo paths m/M, l/L, h/H, v/V
    *
    * @param {string} forPath
-   * @param {boolean} isRelative
    * @param {string} penDown
    *
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataLinetoCommands
    */
-  path_basic(forPath, isRelative, penDown = true) {
+  path_basic(forPath, penDown = true) {
     let matches;
     let x = null;
     let y = null;
@@ -88,7 +91,7 @@ export class PathToLinesClass {
       x = values[0];
       y = values[1];
 
-      if (isRelative) {
+      if (this.isRelative) {
         x += this.x;
         y += this.y;
       }
@@ -100,9 +103,9 @@ export class PathToLinesClass {
       // console.log('singleValues', values);
 
       if (forPath === 'h') {
-        x = values[0] + (isRelative ? this.x : 0);
+        x = values[0] + (this.isRelative ? this.x : 0);
       } else { // if (forPath === 'v')
-        y = values[0] + (isRelative ? this.y : 0);
+        y = values[0] + (this.isRelative ? this.y : 0);
       }
     } else {
       throw new Error('Method only caters for paths m, l, v and h');
@@ -128,10 +131,8 @@ export class PathToLinesClass {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#arcs
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-   *
-   * @param {boolean} isRelative
    */
-  path_A(isRelative) {
+  path_A() {
     const arcKeysInOrder = ['rx', 'ry', 'deg', 'af', 'sf', 'x', 'y'];
     const arcMatches = this.svgPath.match(regexPathArc);
     this.cutCharsFromFront(arcMatches[0].length);
@@ -145,7 +146,7 @@ export class PathToLinesClass {
       coords[arcKeysInOrder[reedBuck]] = values[reedBuck];
     }
 
-    if (isRelative) {
+    if (this.isRelative) {
       // coords.rx = fixFloatOverflow(this.x + coords.rx);
       // coords.ry = fixFloatOverflow(this.y + coords.ry);
       coords.x = fixFloatOverflow(this.x + coords.x);
@@ -163,19 +164,26 @@ export class PathToLinesClass {
 
   /**
    * Write the Stencil Curve XML
-   * @param {boolean} isRelative
    * @param {number[]} values    4 values when called by Smooth Curve and 6 values when called by cubic curve
    * @param {boolean} isSmooth   Flag to say this call is for a smooth curve
    */
-  curveWriter(isRelative, values, isSmooth) {
+  curveWriter(values, isSmooth) {
     const curveKeysInOrder = ['x1', 'y1', 'x2', 'y2', 'x', 'y'];
 
     /** @type {{x1: number, y1: number, x2: number, y2: number, x: number, y: number}} */
     const coords = {};
     if (isSmooth) {
+      let x1 = this.nextDeltaX1;
+      let y1 = this.nextDeltaY1;
+
+      if (!this.isRelative) {
+        x1 = x1 !== 0 ? (x1 + this.x) : this.x;
+        y1 = y1 !== 0 ? (y1 + this.y) : this.y;
+      }
+
       values = [
-        this.nextDeltaX1, // x1, comes from preceding curve's x-end minus x2
-        this.nextDeltaY1, // y1, comes from preceding curve's y-end minus y2
+        x1,
+        y1,
         ...values,
       ];
     }
@@ -184,7 +192,7 @@ export class PathToLinesClass {
       coords[curveKeysInOrder[buffalo]] = values[buffalo];
     }
 
-    if (isRelative) {
+    if (this.isRelative) {
       coords.x1 = fixFloatOverflow(this.x + coords.x1);
       coords.y1 = fixFloatOverflow(this.y + coords.y1);
       coords.x2 = fixFloatOverflow(this.x + coords.x2);
@@ -214,16 +222,13 @@ export class PathToLinesClass {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataCubicBezierCommands
-   *
-   * @param {boolean} isRelative
    */
-  path_C(isRelative) {
+  path_C() {
     // console.log('this.svgPath', this.svgPath);
     const cubicMatches = this.svgPath.match(regexPathCubicCurve);
     // console.log('cubicMatches', cubicMatches);
     this.cutCharsFromFront(cubicMatches[0].length);
     this.curveWriter(
-      isRelative,
       this.valueInMultipleMatches(cubicMatches, pathMatchesPerValue),
       false
     );
@@ -239,17 +244,14 @@ export class PathToLinesClass {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataCubicBezierCommands
-   *
-   * @param {boolean} isRelative
    */
-  path_S(isRelative) {
+  path_S() {
     // Match the first multiple of 4 in the line as it has a different form to the rest
     const smoothFirstMultiple = this.svgPath.match(new RegExp('[sS]' + pathFirst + pathRest.repeat(3)));
 
     // Cut the first multiple of 4 from the front of the line
     this.cutCharsFromFront(smoothFirstMultiple[0].length);
     this.curveWriter(
-      isRelative,
       this.valueInMultipleMatches(smoothFirstMultiple, pathMatchesPerValue),
       true
     );
@@ -261,10 +263,9 @@ export class PathToLinesClass {
 
     for (let safetyBreak = 0; safetyBreak < 20; safetyBreak++) {
       try {
-        let smoothMatches = this.svgPath.match(new RegExp('^' + pathRest.repeat(4)));
+        const smoothMatches = this.svgPath.match(new RegExp('^' + pathRest.repeat(4)));
         this.cutCharsFromFront(smoothMatches[0].length);
         this.curveWriter(
-          isRelative,
           this.valueInMultipleMatches(smoothMatches, pathMatchesPerValue),
           true
         );
