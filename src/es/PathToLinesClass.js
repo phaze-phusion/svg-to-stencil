@@ -31,9 +31,8 @@ export class PathToLinesClass {
     for (let safeBreak = 0; safeBreak < 50 && this.svgPath.length > 0; safeBreak++) {
       const char = this.svgPath[0];
 
-      this.isRelative = char.match(/[mlhvacsz]/) !== null;
+      this.isRelative = char.toLowerCase() === char;
 
-      // console.log('loop ALPHA', char, ' - ', this.svgPath);
       switch (char) {
         // Move
         case 'M': this.path_basic('m', false); break;
@@ -60,7 +59,6 @@ export class PathToLinesClass {
         case 'Z':
         case 'z': this.path_Z(); break;
       }
-      // console.log('loop OMEGA', char, ' - ', this.svgPath);
 
       safeBreak++;
       if (safeBreak > 100)
@@ -86,7 +84,8 @@ export class PathToLinesClass {
     if (forPath === 'm' || forPath === 'l') {
       matches = this.svgPath.match(regexPathLine);
       const values = this.valueInMultipleMatches(matches, pathMatchesPerValue);
-      // console.log('lineMatches', values);
+      // console.log('lineMatches', matches);
+      // console.log('lineValues', values);
 
       x = values[0];
       y = values[1];
@@ -113,13 +112,8 @@ export class PathToLinesClass {
 
     this.setCoordinates(x, y);
     this.cutCharsFromFront(matches[0].length);
-    // console.log('coords path', this.svgPath);
 
-    if (penDown) {
-      this.mxGraph += `<line x="${this.x}" y="${this.y}"/>\n`;
-    } else {
-      this.mxGraph += `<move x="${this.x}" y="${this.y}"/>\n`;
-    }
+    this.mxGraph += `<${penDown ? 'line' : 'move'} x="${this.x}" y="${this.y}"/>\n`;
   }
 
   /**
