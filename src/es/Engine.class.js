@@ -1,6 +1,6 @@
 import {PathToLinesClass} from "./PathToLinesClass";
 import {fixFloatOverflow, pickById} from "./utlis";
-import {parse, INode} from 'svgson';
+import {parse} from 'svgson';
 
 export class EngineClass {
   /** @type {HTMLTextAreaElement} */
@@ -51,7 +51,7 @@ export class EngineClass {
                   + `\n</path>\n`
                   + `<fillstroke/>`;
                 break;
-              case 'circle':
+              case 'circle': {
                 const ellipseW = fixFloatOverflow(svgChild.attributes.r * 2);
                 const ellipseX = fixFloatOverflow(svgChild.attributes.cx - svgChild.attributes.r);
                 const ellipseY = fixFloatOverflow(svgChild.attributes.cy - svgChild.attributes.r);
@@ -62,6 +62,7 @@ export class EngineClass {
                   + `y="${ellipseY}" />\n`
                   + `<fillstroke/>`;
                 break;
+              }
               case 'rect':
               case 'ellipse':
               case 'line':
@@ -71,14 +72,14 @@ export class EngineClass {
             }
 
             if ((know + 1) < svgJson.children.length) {
-              this.stencilForegroundContent += '\n'
+              this.stencilForegroundContent += '\n';
             }
           }
+          return svgJson;
         }
       )
       .finally(
         () => {
-
           if (pickById('include-full').checked) {
             this.stencilContent = `<shape w="${this.svgObject.attributes.width}" `
               + `h="${this.svgObject.attributes.height}" `
@@ -87,8 +88,7 @@ export class EngineClass {
               + `  <foreground>\n    `
               + this.stencilForegroundContent.replace(/\n/g, '\n    ')
               + `\n  </foreground>\n`
-              + `</shape>`
-
+              + `</shape>`;
           } else {
             this.stencilContent = this.stencilForegroundContent;
           }
@@ -96,6 +96,11 @@ export class EngineClass {
           this.taOutputEl.textContent = this.stencilContent;
         }
       )
+      .catch(
+        error => {
+          console.error('svgson experience an error', error);
+        }
+      );
   }
 
   handleEvent(event) {
