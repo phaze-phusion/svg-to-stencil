@@ -1,10 +1,15 @@
 import {fixFloatOverflow} from "./utlis";
 
+const curveFirst = '((-?\\.\\d+)|(-?\\d+\\.\\d+)|(-?\\d+))';
+const curveRest  = '(([- ]?\\.\\d+)|([- ]\\d+\\.\\d+)|([- ]\\d+))';
+const regexPathCubicCurve = new RegExp('^[cC]' + curveFirst + curveRest.repeat(5));
+const curveMatchesPerValue = 4; // From the regex a value can come from 3 separate match indexes
+
 export class PathToLinesClass {
   x = 0;
   y = 0;
-  nextSx2 = 0;
-  nextSy2 = 0;
+  nextDeltaX1 = 0;
+  nextDeltaY1 = 0;
   svgPath = '';
   mxGraph = '';
 
@@ -25,24 +30,24 @@ export class PathToLinesClass {
       // console.log('loop ALPHA', char, ' - ', this.svgPath);
       switch (char) {
         // Move
-        case 'M': this.path_M(false); break;
-        case 'm': this.path_M(true); break;
+        case 'M': this.path_basic('m', false, false); break;
+        case 'm': this.path_basic('m', true, false); break;
         // Line
-        case 'L': this.path_L(false); break;
-        case 'l': this.path_L(true); break;
+        case 'L': this.path_basic('l', false); break;
+        case 'l': this.path_basic('l', true); break;
         // Horizontal line
-        case 'H': this.path_H(false); break;
-        case 'h': this.path_H(true); break;
+        case 'H': this.path_basic('h', false); break;
+        case 'h': this.path_basic('h', true); break;
         // Vertical line
-        case 'V': this.path_V(false); break;
-        case 'v': this.path_V(true); break;
+        case 'V': this.path_basic('v', false); break;
+        case 'v': this.path_basic('v', true); break;
         // Arc
         case 'A': this.path_A(false); break;
         case 'a': this.path_A(true); break;
-        // Curve
+        // Cubic Curve
         case 'C': this.path_C(false); break;
         case 'c': this.path_C(true); break;
-        // S-Curve
+        // Curve
         case 'S': this.path_S(false); break;
         case 's': this.path_S(true); break;
         // End path
@@ -63,39 +68,55 @@ export class PathToLinesClass {
     this.svgPath = this.svgPath.substring(indexStart);
   }
 
-  mxAppendMove() {
-    this.mxGraph += `<move x="${this.x}" y="${this.y}"/>\n`;
-    // this.mxGraph += `<move x='${this.x}' y='${this.y}'/>\n`;
-  }
-
-  mxAppendLine() {
-    this.mxGraph += `<line x="${this.x}" y="${this.y}"/>\n`;
-    // this.mxGraph += `<line x='${this.x}' y='${this.y}'/>\n`;
-  }
-
-  mxAppendClose() {
-    this.mxGraph += `<close/>\n`;
-  }
-
   fixLeadingZeroMatches(matches) {
-    for (let beer = 1; beer < matches.length; beer++) {
-      // Check for NaN
-      if (isNaN(+matches[beer])) {
-        // console.log('matches before', matches);
-        // next coordinate is a decimal without the preceding zero
-        const decimalSplit = matches[beer].split('.');
-        // console.log('decimalSplit', decimalSplit);
-        if (decimalSplit.length === 3) {
-          matches[beer] = `${decimalSplit[0]}.${decimalSplit[1]}`;
-          matches.splice(beer + 1, 0, `.${decimalSplit[2]}`);
-          // matches[beer + 1] = `.${decimalSplit[2]}.${matches[beer + 1]}`;
+
+    // start at index 1 as 0 is the whole string that was matched
+    for (let kudu = 1; kudu < matches.length; kudu++) {
+      // 2 or more decimals in a group will cause a NaN when converted to a number
+      if (isNaN(+matches[kudu])) {
+        console.log('matches before', matches);
+
+        // If the match only contains a decimal point
+        if (matches[kudu] === '.') {
+          // TODO: Finish thought process
         }
+
+
+        // when 2 or more numbers are joined by decimal points it
+        // means they're all fractions and the leading zero was omitted
+        // example: "-.11.35.03.74"
+        if (matches[kudu].substring(0, 1) === '.' || matches[kudu].substring(0, 2) === '-.') {
+          const fractions = matches[kudu].split('.');
+          let matchesInsertionPoint = kudu + 1;
+
+          // Join the first 2 fraction parts with a decimal as they're part of the same number (eg "-" and "11)
+          // and splice them into the matches array right after the one we're working on
+          matches.splice(matchesInsertionPoint, 0, `${fractions[0]}.${fractions[1]}`);
+
+          // For the rest of the fraction parts, prepend a decimal point
+          // and splice them into the matches array one after the other
+          for (let aardvark = 2; aardvark < fractions.length; aardvark++) {
+            matchesInsertionPoint++;
+            matches.splice(matchesInsertionPoint, 0, `.${fractions[aardvark]}`);
+          }
+
+          // lastly remove the original match that we just worked on
+          matches.splice(kudu, 1);
+        }
+
+        // // next coordinate is a decimal without the preceding zero
+        // const decimalSplit = matches[kudu].split('.');
+        // // console.log('decimalSplit', decimalSplit);
+        // if (decimalSplit.length === 3) {
+        //   matches[kudu] = `${decimalSplit[0]}.${decimalSplit[1]}`;
+        //   matches.splice(kudu + 1, 0, `.${decimalSplit[2]}`);
+        // }
         // console.log('matches after', matches);
-      } else if (matches[beer].substring(matches[beer].length - 1, matches[beer].length) === '.') {
+      } else if (matches[kudu].substring(matches[kudu].length - 1, matches[kudu].length) === '.') {
         // console.log('last dot before', matches);
         // trailing dot clearly means this match was cut up
-        matches[beer] = matches[beer] + matches[beer + 1];
-        matches.splice(beer + 1, 1); // remove the match that has been joined with the previous match
+        matches[kudu] = matches[kudu] + matches[kudu + 1];
+        matches.splice(kudu + 1, 1); // remove the match that has been joined with the previous match
         // console.log('last dot after', matches);
       }
     }
@@ -109,70 +130,50 @@ export class PathToLinesClass {
     if (y !== null) {
       this.y = fixFloatOverflow(y);
     }
+    console.log('x-y', this.x, this.y);
   }
 
-  get1Coordinate() {
-    // console.log('match 1 path before', this.svgPath);
-    const matches = this.svgPath.match(/[hv](-?[0-9.]+)/i);
+  path_basic(forPath, isRelative, penDown = true) {
+    let matches;
+    let x = null;
+    let y = null;
+
+    if (forPath === 'm' || forPath === 'l') {
+      matches = this.svgPath.match(/[ml](-?[0-9.]+) ?(-?[0-9.]+)/i);
+      matches = this.fixLeadingZeroMatches(matches);
+      x = +matches[1];
+      y = +matches[2];
+
+      if (isRelative) {
+        x += this.x;
+        y += this.y;
+      }
+
+    } else if (forPath === 'h' || forPath === 'v') {
+      matches = this.svgPath.match(/[hv](-?[0-9.]+)/i);
+
+      if (forPath === 'h') {
+        x = +matches[1] + (isRelative ? this.x : 0);
+      } else { // if (forPath === 'v')
+        y = +matches[1] + (isRelative ? this.y : 0);
+      }
+    } else {
+      throw error('Method only caters for paths m, l, v and h');
+    }
+
+    this.setCoordinates(x, y);
+
     const cutStartIndex = matches[0].length;
-    // console.log('match 1', matches);
+    // console.log('coords matches', matches);
     // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
     this.cutCharsFromFront(cutStartIndex);
-    // console.log('match 1 path after', this.svgPath);
-    return +matches[1];
-  }
+    // console.log('coords path', this.svgPath);
 
-  get2Coordinates() {
-    let matches = this.svgPath.match(/[ml](-?[0-9.]+) ?(-?[0-9.]+)/i);
-    matches = this.fixLeadingZeroMatches(matches);
-
-    const cutStartIndex = matches[0].length;
-    // console.log('match 2', matches);
-    // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
-    this.cutCharsFromFront(cutStartIndex);
-    // console.log('match 2 path', this.svgPath);
-    return {
-      x: +matches[1],
-      y: +matches[2],
-    };
-  }
-
-  path_M(isRelative) {
-    const coords = this.get2Coordinates();
-    if (isRelative) {
-      coords.x += this.x;
-      coords.y += this.y;
+    if (penDown) {
+      this.mxGraph += `<line x="${this.x}" y="${this.y}"/>\n`;
+    } else {
+      this.mxGraph += `<move x="${this.x}" y="${this.y}"/>\n`;
     }
-    this.setCoordinates(coords.x, coords.y);
-    this.mxAppendMove();
-  }
-
-  path_L(isRelative) {
-    const coords = this.get2Coordinates();
-    if (isRelative) {
-      coords.x += this.x;
-      coords.y += this.y;
-    }
-    this.setCoordinates(coords.x, coords.y);
-    this.mxAppendLine();
-  }
-
-  path_H(isRelative) {
-    let x = this.get1Coordinate();
-    if (isRelative) {
-      x += this.x;
-    }
-    this.setCoordinates(x, null);
-    this.mxAppendLine();
-  }
-
-  path_V(isRelative) {
-    let y = this.get1Coordinate();
-    if (isRelative) {
-      y += this.y;
-    }
-    this.setCoordinates(null, y);
-    this.mxAppendLine();
   }
 
   path_A(isRelative) {
@@ -217,19 +218,28 @@ export class PathToLinesClass {
       + `x="${this.x}" y="${this.y}"/>\n`
   }
 
-  path_C_writer(matches, isRelative) {
-    // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
-    // console.log('match C path', this.svgPath);
-    const coords = {
-      x1: +matches[1],
-      y1: +matches[2],
-      x2: +matches[3],
-      y2: +matches[4],
-      x: +matches[5],
-      y: +matches[6],
+  /**
+   * Write the Stencil Curve XML
+   * @param {boolean} isRelative
+   * @param {number[]} values    4 values when called by Smooth Curve and 6 values when called by cubic curve
+   * @param {boolean} isSmooth   Flag to say this call is for a smooth curve
+   */
+  curveWriter(isRelative, values, isSmooth) {
+    const curveKeysInOrder = ['x1', 'y1', 'x2', 'y2', 'x', 'y'];
+
+    /** @type {{x1: number, y1: number, x2: number, y2: number, x: number, y: number, }} */
+    const coords = {};
+    if (isSmooth) {
+      values = [
+        this.nextDeltaX1, // x1, comes from preceding curve's x-end minus x2
+        this.nextDeltaY1, // y1, comes from preceding curve's y-end minus y2
+        ...values,
+      ];
     }
 
-    // console.table(coords);
+    for (let buffalo = 0; buffalo < values.length; buffalo++) {
+      coords[curveKeysInOrder[buffalo]] = values[buffalo];
+    }
 
     if (isRelative) {
       coords.x1 = fixFloatOverflow(this.x + coords.x1);
@@ -240,9 +250,9 @@ export class PathToLinesClass {
       coords.y = fixFloatOverflow(this.y + coords.y);
     }
 
-    // Used to fake a matrix conversion for s-curves
-    this.nextSx2 = coords.x - coords.x2;
-    this.nextSy2 = coords.y - coords.y2;
+    // Used to fake a matrix conversion for smooth curves
+    this.nextDeltaX1 = coords.x - coords.x2;
+    this.nextDeltaY1 = coords.y - coords.y2;
 
     this.setCoordinates(coords.x, coords.y);
 
@@ -252,63 +262,68 @@ export class PathToLinesClass {
       + `x3="${coords.x}" y3="${coords.y}"/>\n`
   }
 
+  /**
+   * Handle the SVG Cubic Curve bezier path c/C
+   * It has this form:
+   *    C x1 y1 x2 y2 x y
+   * or
+   *    c dx1 dy1 dx2 dy2 dx dy
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
+   *
+   * @param {boolean} isRelative
+   */
   path_C(isRelative) {
-    // c dx1 dy1, dx2 dy2, dx dy
-
-    // match 1 -> x1
-    // match 2 -> y1
-    // match 3 -> x2
-    // match 4 -> y2
-    // match 5 -> end x
-    // match 6 -> end y
-    let matches = this.svgPath.match(/[cC](-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+)/);
-    matches = this.fixLeadingZeroMatches(matches);
-    const cutStartIndex = matches[0].length;
-    this.cutCharsFromFront(cutStartIndex);
-
-    this.path_C_writer(matches, isRelative);
+    console.log('this.svgPath', this.svgPath);
+    const cubicMatches = this.svgPath.match(regexPathCubicCurve);
+    console.log('cubicMatches', cubicMatches);
+    this.cutCharsFromFront(cubicMatches[0].length);
+    this.curveWriter(
+      isRelative,
+      this.valueInMultipleMatches(cubicMatches, curveMatchesPerValue),
+      false
+    );
   }
 
+  /**
+   * Handle the SVG Smooth Curve bezier path s/S
+   * Smooth curves can only come after a Cubic Curve, and they have values in multiples of 4
+   * It has this form:
+   *    S x2 y2 x y
+   * or
+   *    s dx2 dy2 dx dy
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
+   *
+   * @param {boolean} isRelative
+   */
   path_S(isRelative) {
-    // s x2 y2, x y
+    // Match the first multiple of 4 in the line as it has a different form to the rest
+    const smoothFirstMultiple = this.svgPath.match(new RegExp('[sS]' + curveFirst + curveRest.repeat(3)));
 
-    // match 1 -> x2
-    // match 2 -> y2
-    // match 3 -> end x
-    // match 4 -> end y
-    // rinse and repeat for multiples of 4
-    this.svgPath = this.svgPath.substring(1); // lob off preceding 's'
+    // Cut the first multiple of 4 from the front of the line
+    this.cutCharsFromFront(smoothFirstMultiple[0].length);
+    this.curveWriter(
+      isRelative,
+      this.valueInMultipleMatches(smoothFirstMultiple, curveMatchesPerValue),
+      true
+    );
+
+    // If the next character in the line is a letter then there are no more smooth curve values to extract
+    if (this.svgPath.substring(0, 1).match(/[a-z]/i)) {
+      return;
+    }
 
     let safetyBreak = 0;
     while (true) {
       try {
-        let matches = this.svgPath.match(/^([- ]?[0-9.]+[- ][0-9.]+[- ][0-9.]+[- ][0-9.]+)/);
-        if (matches === null) {
-          // TODO fix for leading zeros issue in these sets
-          // matches = this.svgPath.match(/^([- ]?[0-9.]+[- ]?[0-9.]+[- ]?[0-9.]+[- ]?[0-9.]+)/)
-          // fixLeadingZeroMatches
-          // if (matches === null)
-          break;
-        }
-
-        const cutStartIndex = matches[0].length;
-        this.cutCharsFromFront(cutStartIndex);
-
-        const matchesForCPath = matches[1].match(/(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+)/);
-        matchesForCPath.splice(1, 0, this.nextSx2);
-        matchesForCPath.splice(2, 0, this.nextSy2);
-
-        // if not relative convert to relative to make math easier
-        if (isRelative === false) {
-          // matchesForCPath[1] is the spliced in value
-          // matchesForCPath[2] is the spliced in value
-          matchesForCPath[3] = (+matchesForCPath[3]) - this.x;
-          matchesForCPath[4] = (+matchesForCPath[4]) - this.y;
-          matchesForCPath[5] = (+matchesForCPath[5]) - this.x;
-          matchesForCPath[6] = (+matchesForCPath[6]) - this.y;
-        }
-
-        this.path_C_writer(matchesForCPath, true);
+        let smoothMatches = this.svgPath.match(new RegExp('^' + curveRest.repeat(4)));
+        this.cutCharsFromFront(smoothMatches[0].length);
+        this.curveWriter(
+          isRelative,
+          this.valueInMultipleMatches(smoothMatches, curveMatchesPerValue),
+          true
+        );
       } catch {
         break;
       }
@@ -318,46 +333,32 @@ export class PathToLinesClass {
         break;
     }
 
+  }
 
-    // let matchSets = this.svgPath.match(/[sS]([- ]?[0-9.]+[- ][0-9.]+[- ][0-9.]+[- ][0-9.]+)/);
-    // let matches = this.svgPath.match(/[sS](-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+) ?(-?[0-9.]+)/);
-    // matches = this.fixLeadingZeroMatches(matches);
-    // const cutStartIndex = matches[0].length;
-    // this.cutCharsFromFront(cutStartIndex);
-    //
-    // // console.log('str to cut', this.svgPath.substring(0, cutStartIndex));
-    // // console.log('match C path', this.svgPath);
-    // const coords = {
-    //   x1: +matches[1],
-    //   y1: +matches[2],
-    //   x2: +matches[3],
-    //   y2: +matches[4],
-    //   x: +matches[5],
-    //   y: +matches[6],
-    // }
-    //
-    // // console.table(coords);
-    //
-    // if (isRelative) {
-    //   coords.x1 = fixFloatOverflow(this.x + coords.x1);
-    //   coords.y1 = fixFloatOverflow(this.y + coords.y1);
-    //   coords.x2 = fixFloatOverflow(this.x + coords.x2);
-    //   coords.y2 = fixFloatOverflow(this.y + coords.y2);
-    //   coords.x = fixFloatOverflow(this.x + coords.x);
-    //   coords.y = fixFloatOverflow(this.y + coords.y);
-    // }
-    //
-    // this.setCoordinates(coords.x, coords.y);
-    //
-    // this.mxGraph += `<curve `
-    //   + `x1="${coords.x1}" y1="${coords.y1}" `
-    //   + `x2="${coords.x2}" y2="${coords.y2}" `
-    //   + `x3="${coords.x}" y3="${coords.y}"/>\n`
+  /**
+   * @param {string[]} matches
+   * @param {number} matchesPerValue
+   * @returns {number[]}
+   */
+  valueInMultipleMatches(matches, matchesPerValue) {
+    console.log('matches', matches);
+    const valueArr = [];
+    for (let bushPig = 1; bushPig < matches.length; bushPig++) {
+      for (let piglet = 0; piglet < matchesPerValue; piglet++) {
+        const matchToTest = matches[bushPig + piglet];
+        if (typeof matchToTest !== 'undefined') {
+          valueArr.push(+matchToTest);
+          bushPig += (matchesPerValue - piglet - 1); // advance outer for-loop minus 1 for outer loops iterator
+          break;
+        }
+      }
+    }
+    return valueArr;
   }
 
   path_Z() {
     this.cutCharsFromFront(1);
-    this.mxAppendClose()
+    this.mxGraph += `<close/>\n`;
   }
 
 }
