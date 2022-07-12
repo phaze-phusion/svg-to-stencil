@@ -222,7 +222,7 @@ module.exports = (env, argv) => {
       }),
       new HtmlWebpackPlugin({
         favicon: path.resolve(pathRoot, './src/favicon.ico'),
-        inject: false,
+        inject: true,
         hash: false,
         template: path.resolve(pathRoot, './src/index.html'),
         filename: `${packageName}.html`,
