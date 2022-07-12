@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "author": "Leon Cilliers <phaze.phusion@gmail.com>",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "lint-es": "eslint src/**/*.js",
     "lint-scss": "stylelint 'src/scss/**/*.scss' --config stylelint.config.js --fix",
