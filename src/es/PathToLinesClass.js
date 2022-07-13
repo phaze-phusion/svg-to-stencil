@@ -10,24 +10,37 @@ const regexPathLine = new RegExp('^[lmLM]' + pathFirst + pathRest);
 const regexPathSingle = new RegExp('^[hvHV]' + pathFirst);
 
 export class PathToLinesClass {
-  x = 0;
-  y = 0;
-  nextDeltaX1 = 0;
-  nextDeltaY1 = 0;
-  svgPath = '';
-  mxGraph = '';
-  isRelative = null;
+  /** @type {number} */
+  x;
 
-  constructor() {
-  }
+  /** @type {number} */
+  y;
 
-  convert(path) {
+  /** @type {number} */
+  nextDeltaX1;
+
+  /** @type {number} */
+  nextDeltaY1;
+
+  /** @type {string} */
+  svgPath;
+
+  /** @type {string} */
+  mxGraph;
+
+  /** @type {boolean} */
+  isRelative;
+
+  constructor(path) {
     this.x = 0;
     this.y = 0;
-    this.svgPath = '';
-    this.mxGraph = '';
     this.svgPath = path;
+    this.mxGraph = '';
 
+    this.convert();
+  }
+
+  convert() {
     for (let safeBreak = 0; safeBreak < 250 && this.svgPath.length > 0; safeBreak++) {
       const char = this.svgPath[0];
 
@@ -63,7 +76,7 @@ export class PathToLinesClass {
       // console.log(safeBreak);
     }
 
-    return this.mxGraph.trim();
+    this.mxGraph = this.mxGraph.trim();
   }
 
   /**

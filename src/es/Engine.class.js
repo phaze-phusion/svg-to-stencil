@@ -3,51 +3,40 @@ import {fixFloatOverflow, pickById} from "./utlis";
 import {parse} from 'svgson';
 
 export class EngineClass {
-  /** @type {HTMLTextAreaElement} */
-  taInputEl = null;
-
-  /** @type {HTMLTextAreaElement} */
-  taOutputEl = null;
-
   /** @type {INode} */
-  svgObject = null;
+  _svgObject = null;
 
   /** @type {string} */
-  stencilForegroundContent = '';
-
-  /** @type {string} */
-  stencilContent = '';
-
-  /** @type {PathToLinesClass} */
-  _pathToLine = new PathToLinesClass();
+  _stencilForegroundContent = '';
 
   constructor() {
   }
 
   start() {
-    this.taInputEl = pickById('svg-in');
-    this.taOutputEl = pickById('mx-out');
     pickById('convert-btn').addEventListener('click', this);
   }
 
   onConvert() {
-    this.stencilForegroundContent = '';
-    parse(this.taInputEl.value)
+    this._stencilForegroundContent = '';
+    parse(pickById('svg-in').value)
       .then(
         (svgJson) => {
           // When 2 or more svg objects are present
           if (svgJson instanceof Array)
             svgJson = svgJson[0];
 
-          this.svgObject = svgJson;
+          this._svgObject = svgJson;
           // console.log(svgJson);
 
           for (let know = 0; know < svgJson.children.length; know++) {
             const svgChild = svgJson.children[know];
             switch (svgChild.name) {
               case 'path':
-                this.stencilForegroundContent += `<path>\n  `
-                  + this._pathToLine.convert(svgChild.attributes.d).split('\n').join('\n  ')
+                /** @type {PathToLinesClass} */
+                const pathToLine = new PathToLinesClass(svgChild.attributes.d);
+
+                this._stencilForegroundContent += `<path>\n  `
+                  + pathToLine.mxGraph.split('\n').join('\n  ')
                   + `\n</path>\n`
                   + `<fillstroke/>`;
                 break;
@@ -55,7 +44,7 @@ export class EngineClass {
                 const ellipseW = fixFloatOverflow(svgChild.attributes.r * 2);
                 const ellipseX = fixFloatOverflow(svgChild.attributes.cx - svgChild.attributes.r);
                 const ellipseY = fixFloatOverflow(svgChild.attributes.cy - svgChild.attributes.r);
-                this.stencilForegroundContent += `<ellipse `
+                this._stencilForegroundContent += `<ellipse `
                   + `w="${ellipseW}" `
                   + `h="${ellipseW}" `
                   + `x="${ellipseX}" `
@@ -72,7 +61,7 @@ export class EngineClass {
             }
 
             if ((know + 1) < svgJson.children.length) {
-              this.stencilForegroundContent += '\n';
+              this._stencilForegroundContent += '\n';
             }
           }
           return svgJson;
@@ -80,20 +69,22 @@ export class EngineClass {
       )
       .finally(
         () => {
+          let stencilContent;
+
           if (pickById('include-full').checked) {
-            this.stencilContent = `<shape w="${this.svgObject.attributes.width}" `
-              + `h="${this.svgObject.attributes.height}" `
+            stencilContent = `<shape w="${this._svgObject.attributes.width}" `
+              + `h="${this._svgObject.attributes.height}" `
               + `aspect="fixed" strokewidth="inherit">\n`
               + `  <connections />\n  <background>\n    <fillstroke />\n  </background>\n`
               + `  <foreground>\n    `
-              + this.stencilForegroundContent.replace(/\n/g, '\n    ')
+              + this._stencilForegroundContent.replace(/\n/g, '\n    ')
               + `\n  </foreground>\n`
               + `</shape>`;
           } else {
-            this.stencilContent = this.stencilForegroundContent;
+            stencilContent = this._stencilForegroundContent;
           }
 
-          this.taOutputEl.textContent = this.stencilContent;
+          pickById('mx-out').textContent = stencilContent;
         }
       )
       .catch(
