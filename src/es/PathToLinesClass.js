@@ -28,7 +28,7 @@ export class PathToLinesClass {
     this.mxGraph = '';
     this.svgPath = path;
 
-    for (let safeBreak = 0; safeBreak < 50 && this.svgPath.length > 0; safeBreak++) {
+    for (let safeBreak = 0; safeBreak < 250 && this.svgPath.length > 0; safeBreak++) {
       const char = this.svgPath[0];
 
       this.isRelative = char.toLowerCase() === char;
@@ -60,9 +60,7 @@ export class PathToLinesClass {
         case 'z': this.path_Z(); break;
       }
 
-      safeBreak++;
-      if (safeBreak > 100)
-        break;
+      // console.log(safeBreak);
     }
 
     return this.mxGraph.trim();
