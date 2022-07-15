@@ -1,5 +1,6 @@
 import {fixFloatOverflow} from "./utlis";
 
+const pathLengthLimit = 250;
 const pathMatchesPerValue = 4; // From the regex a value can come from 3 separate match indexes
 const pathFirst = '((-?\\.\\d+)|(-?\\d+\\.\\d+)|(-?\\d+))';
 const pathRest  = '(([- ]?\\.\\d+)|([- ]\\d+\\.\\d+)|([- ]\\d+))';
@@ -41,7 +42,7 @@ export class PathToLinesClass {
   }
 
   convert() {
-    for (let safeBreak = 0; safeBreak < 250 && this.svgPath.length > 0; safeBreak++) {
+    for (let safeBreak = 0; safeBreak < pathLengthLimit && this.svgPath.length > 0; safeBreak++) {
       const char = this.svgPath[0];
 
       this.isRelative = char.toLowerCase() === char;
@@ -73,7 +74,9 @@ export class PathToLinesClass {
         case 'z': this.path_Z(); break;
       }
 
-      // console.log(safeBreak);
+      if ((safeBreak + 1) === pathLengthLimit) {
+        console.warn('Path length limit reached');
+      }
     }
 
     this.mxGraph = this.mxGraph.trim();
