@@ -1,7 +1,7 @@
 @import 'modern-normalize/modern-normalize.css';
-@import 'variables';
-@import 'functions';
-@import 'mixins';
+@import './scss/variables';
+@import './scss/functions';
+@import './scss/mixins';
 
 html,
 body {

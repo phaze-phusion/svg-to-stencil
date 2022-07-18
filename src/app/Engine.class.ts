@@ -1,7 +1,8 @@
 import {PathToLinesClass} from "./PathToLinesClass";
-import {fixFloatOverflow, pickById} from "../shared/utlis";
+import {fixFloatOverflow, pickById} from "./shared/utlis";
 import {parse} from 'svgson';
-import {INode} from '../models/INode.interface';
+import {INode} from './models/INode.interface';
+import {elementId} from './models/elementId.enum';
 
 export class EngineClass {
   private _stencilForegroundContent = '';
@@ -10,12 +11,12 @@ export class EngineClass {
   // }
 
   start(): void {
-    (pickById('convert-btn') as HTMLButtonElement).addEventListener('click', this);
+    (pickById(elementId.convertButton) as HTMLButtonElement).addEventListener('click', this);
   }
 
   onConvert(): void {
     this._stencilForegroundContent = '';
-    let inputValue = (pickById('svg-in') as HTMLTextAreaElement).value;
+    let inputValue = (pickById(elementId.svgInput) as HTMLTextAreaElement).value;
 
     // remove line breaks
     inputValue = inputValue.replace(/\n+/g, ' ');
@@ -89,7 +90,7 @@ export class EngineClass {
   outputMxGraph(svgObject: INode): void {
     let stencilContent;
 
-    if ((pickById('include-full') as HTMLInputElement).checked) {
+    if ((pickById(elementId.checkboxIncludeFull) as HTMLInputElement).checked) {
       stencilContent = `<shape w="${svgObject.attributes.width}" `
         + `h="${svgObject.attributes.height}" `
         + `aspect="fixed" strokewidth="inherit">\n`
@@ -102,7 +103,7 @@ export class EngineClass {
       stencilContent = this._stencilForegroundContent;
     }
 
-    (pickById('mx-out') as HTMLTextAreaElement).textContent = stencilContent;
+    (pickById(elementId.stencilOutput) as HTMLTextAreaElement).textContent = stencilContent;
   }
 }
 

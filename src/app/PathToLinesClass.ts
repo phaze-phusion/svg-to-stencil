@@ -1,4 +1,4 @@
-import {fixFloatOverflow} from "../shared/utlis";
+import {fixFloatOverflow} from "./shared/utlis";
 
 const pathLengthLimit = 250;
 const pathMatchesPerValue = 4; // From the regex a value can come from 3 separate match indexes

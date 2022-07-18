@@ -1,4 +1,3 @@
-import path from 'path';
 import {Configuration as WebpackConfiguration, WebpackPluginInstance} from 'webpack';
 import {Configuration as WebpackDevServerConfiguration} from 'webpack-dev-server';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
@@ -11,13 +10,10 @@ import StyleLintPlugin from 'stylelint-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import {default as npmPackage} from './package.json';
 
-/* global __dirname */
-
 interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
 }
 
-const pathRoot = __dirname;
 const packageName = npmPackage.name;
 
 module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production' }) => {
@@ -26,7 +22,7 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
   const config: Configuration = {
     name: packageName,
     mode: argv.mode,
-    entry: path.resolve(pathRoot, './src/app/index.ts'),
+    entry: './src/main.ts',
     // https://webpack.js.org/configuration/output/
     output: {
       filename: `[name].js`,
@@ -67,7 +63,8 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
                 sassOptions: {
                   outputStyle: 'expanded',
                   includePaths: [
-                    path.join(pathRoot, 'src/styles/'),
+                    'src/styles.scss',
+                    'src/styles/'
                   ],
                 },
               },
@@ -95,10 +92,10 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
         chunkFilename: '[id].css',
       }),
       new HtmlWebpackPlugin({
-        favicon: path.resolve(pathRoot, './src/favicon.ico'),
+        favicon: './src/favicon.ico',
         inject: true,
         hash: false,
-        template: path.resolve(pathRoot, './src/index.html'),
+        template: './src/index.html',
         filename: (argv.mode === 'development' ? 'index.html' : `${packageName}.html`),
       }),
       new ForkTsCheckerWebpackPlugin({
@@ -120,7 +117,7 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
     config.devServer = {
       hot: true,
       watchFiles: ['src/**/*'],
-      static: path.join(pathRoot, 'local'),
+      // static: 'local',
       host: 'localhost',
       port: 4600,
     };
@@ -134,7 +131,7 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
   if (argv.mode === 'production') {
     config.output = {
       filename: `script.min.js`,
-      path: path.resolve(pathRoot, './dist/'),
+      path: './dist/',
     };
 
     // https://webpack.js.org/configuration/performance/
@@ -201,8 +198,8 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
         exclude: 'node_modules'
       }),
       new StyleLintPlugin({
-        configFile: path.resolve(pathRoot, './stylelint.config.js'),
-        files: 'src/styles/*.scss',
+        configFile: './stylelint.config.js',
+        files: 'src/*.scss',
       }),
     ];
 

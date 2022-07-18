@@ -2,13 +2,13 @@
   "name": "svg-to-stencil",
   "version": "1.0.1",
   "description": "Convert SVG paths to MXGraph syntax used in DrawIO stencils",
-  "main": "src/app/index.ts",
+  "main": "src/main.ts",
   "author": "Leon Cilliers <phaze.phusion@gmail.com>",
   "private": true,
   "license": "MIT",
   "scripts": {
     "lint-es": "eslint src/**/*.ts",
-    "lint-scss": "stylelint 'src/styles/**/*.scss' --config stylelint.config.js --fix",
+    "lint-scss": "stylelint 'src/scss/**/*.scss' --config stylelint.config.js --fix",
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
     "prebuild": "run-p lint-scss lint-es -s"
