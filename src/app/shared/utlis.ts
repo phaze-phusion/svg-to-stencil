@@ -1,14 +1,12 @@
 const precision = 1e2;
 
-/**
- * @param {string} id
- * @return {HTMLElement}
- */
-export function pickById(id) {
+export type Nullable<T> = T | null;
+
+export function pickById(id: string): Nullable<HTMLElement> {
   return document.getElementById(id);
 }
 
-export function fixFloatOverflow(value) {
+export function fixFloatOverflow(value: number): number {
   if ((value + '').length > 15) {
     value = Math.round(value * precision) / precision;
   }

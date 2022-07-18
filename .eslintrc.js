@@ -1,38 +1,30 @@
 module.exports = {
-  parser: '@babel/eslint-parser',
+  root: true,
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: '2015',
+    ecmaVersion: 2018,
     sourceType: 'module',
-    requireConfigFile: false,
+    // requireConfigFile: false,
     ecmaFeatures: {
       modules: true,
       experimentalObjectRestSpread: true,
       impliedStrict: true,
       arrowFunction: true
     },
-    babelOptions: {
-      presets: [
-        [
-          '@babel/preset-env',
-          {
-            useBuiltIns: 'usage',
-            corejs: '3.23.3',
-            modules: 'commonjs',
-          },
-        ],
-      ],
-    },
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:eslint-comments/recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings'
-  ],
   plugins: [
     'import',
     'babel',
-    'promise'
+    'promise',
+    'prefer-arrow',
+    '@typescript-eslint',
+  ],
+  extends: [
+    'eslint:recommended',
+    'plugin:import/recommended', // this is shorthand for 'plugin:import/errors' and 'plugin:import/warnings'
+    'plugin:import/typescript',
+    'plugin:eslint-comments/recommended',
+    "plugin:@typescript-eslint/recommended"
   ],
   env: {
     es6: true,
@@ -43,9 +35,9 @@ module.exports = {
   ignorePatterns: [
     'dist/',
     'documentation/',
-    'node_modules/',
-    'local/',
+    'node_modules/'
   ],
+
   // 0 or "off" or 0 - turn the rule off
   // 1 or "warn" - turn the rule on as a warning (doesn't affect exit code)
   // 2 or "error" - turn the rule on as an error (exit code is 1 when triggered)
@@ -90,9 +82,4 @@ module.exports = {
     'import/no-dynamic-require': 0,
     'import/no-unused-modules': 2
   },
-  settings: {
-    'import/ignore': [
-      '/local/'
-    ]
-  }
 };

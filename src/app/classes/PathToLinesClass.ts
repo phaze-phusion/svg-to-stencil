@@ -1,4 +1,4 @@
-import {fixFloatOverflow} from "./utlis";
+import {fixFloatOverflow} from "../shared/utlis";
 
 const pathLengthLimit = 250;
 const pathMatchesPerValue = 4; // From the regex a value can come from 3 separate match indexes
@@ -11,37 +11,21 @@ const regexPathLine = new RegExp('^[lmLM]' + pathFirst + pathRest);
 const regexPathSingle = new RegExp('^[hvHV]' + pathFirst);
 
 export class PathToLinesClass {
-  /** @type {number} */
-  x;
+  private x: number;
+  private y: number;
+  private nextDeltaX1 = 0;
+  private nextDeltaY1 = 0;
+  private isRelative = true;
+  public mxGraph: string;
 
-  /** @type {number} */
-  y;
-
-  /** @type {number} */
-  nextDeltaX1;
-
-  /** @type {number} */
-  nextDeltaY1;
-
-  /** @type {string} */
-  svgPath;
-
-  /** @type {string} */
-  mxGraph;
-
-  /** @type {boolean} */
-  isRelative;
-
-  constructor(path) {
+  constructor(private svgPath: string) {
     this.x = 0;
     this.y = 0;
-    this.svgPath = path;
     this.mxGraph = '';
-
     this.convert();
   }
 
-  convert() {
+  convert(): void {
     for (let safeBreak = 0; safeBreak < pathLengthLimit && this.svgPath.length > 0; safeBreak++) {
       const char = this.svgPath[0];
 
@@ -85,18 +69,21 @@ export class PathToLinesClass {
   /**
    * Handle SVG LineTo paths m/M, l/L, h/H, v/V
    *
-   * @param {string} forPath
-   * @param {string} penDown
-   *
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataLinetoCommands
    */
-  path_basic(forPath, penDown = true) {
+  path_basic(forPath: string, penDown = true): void {
     let matches;
     let x = null;
     let y = null;
 
     if (forPath === 'm' || forPath === 'l') {
       matches = this.svgPath.match(regexPathLine);
+
+      if (matches === null) {
+        console.error('Path Basic: matches is null for "m" or "l"');
+        return;
+      }
+
       const values = this.valueInMultipleMatches(matches, pathMatchesPerValue);
       // console.log('lineMatches', matches);
       // console.log('lineValues', values);
@@ -111,6 +98,12 @@ export class PathToLinesClass {
 
     } else if (forPath === 'h' || forPath === 'v') {
       matches = this.svgPath.match(regexPathSingle);
+
+      if (matches === null) {
+        console.error('Path Basic: matches is null for "h" or "v"');
+        return;
+      }
+
       const values = this.valueInMultipleMatches(matches, pathMatchesPerValue);
       // console.log('singleMatches', matches);
       // console.log('singleValues', values);
@@ -140,19 +133,28 @@ export class PathToLinesClass {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#arcs
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
    */
-  path_A() {
-    const arcKeysInOrder = ['rx', 'ry', 'deg', 'af', 'sf', 'x', 'y'];
+  path_A(): void {
     const arcMatches = this.svgPath.match(regexPathArc);
+
+    if (arcMatches === null) {
+      console.error('Path A: arcMatches is null');
+      return;
+    }
+
     this.cutCharsFromFront(arcMatches[0].length);
     const values = this.valueInMultipleMatches(arcMatches, pathMatchesPerValue);
     // console.log('arcMatches', arcMatches);
     // console.log('arcValues', values);
 
-    /** @type {{rx: number, ry: number, deg: number, af: number, sf: number, x: number, y: number }} */
-    const coords = {};
-    for (let reedBuck = 0; reedBuck < values.length; reedBuck++) {
-      coords[arcKeysInOrder[reedBuck]] = values[reedBuck];
-    }
+    const coords: {rx: number, ry: number, deg: number, af: number, sf: number, x: number, y: number} = {
+      rx: values[0],
+      ry: values[1],
+      deg: values[2],
+      af: values[3],
+      sf: values[4],
+      x: values[5],
+      y: values[6]
+    };
 
     if (this.isRelative) {
       // coords.rx = fixFloatOverflow(this.x + coords.rx);
@@ -175,11 +177,7 @@ export class PathToLinesClass {
    * @param {number[]} values    4 values when called by Smooth Curve and 6 values when called by cubic curve
    * @param {boolean} isSmooth   Flag to say this call is for a smooth curve
    */
-  curveWriter(values, isSmooth) {
-    const curveKeysInOrder = ['x1', 'y1', 'x2', 'y2', 'x', 'y'];
-
-    /** @type {{x1: number, y1: number, x2: number, y2: number, x: number, y: number}} */
-    const coords = {};
+  curveWriter(values: number[], isSmooth: boolean) {
     if (isSmooth) {
       let x1 = this.nextDeltaX1;
       let y1 = this.nextDeltaY1;
@@ -196,9 +194,18 @@ export class PathToLinesClass {
       ];
     }
 
-    for (let buffalo = 0; buffalo < values.length; buffalo++) {
-      coords[curveKeysInOrder[buffalo]] = values[buffalo];
-    }
+    const coords: {x1: number, y1: number, x2: number, y2: number, x: number, y: number} = {
+      x1: values[0],
+      y1: values[1],
+      x2: values[2],
+      y2: values[3],
+      x: values[4],
+      y: values[5]
+    };
+
+    // for (let buffalo = 0; buffalo < values.length; buffalo++) {
+    //   coords[curveKeysInOrder[buffalo]] = values[buffalo];
+    // }
 
     if (this.isRelative) {
       coords.x1 = fixFloatOverflow(this.x + coords.x1);
@@ -231,10 +238,14 @@ export class PathToLinesClass {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataCubicBezierCommands
    */
-  path_C() {
+  path_C(): void {
     // console.log('this.svgPath', this.svgPath);
     const cubicMatches = this.svgPath.match(regexPathCubicCurve);
     // console.log('cubicMatches', cubicMatches);
+    if (cubicMatches === null) {
+      console.error('Path C: cubicMatches is null');
+      return;
+    }
     this.cutCharsFromFront(cubicMatches[0].length);
     this.curveWriter(
       this.valueInMultipleMatches(cubicMatches, pathMatchesPerValue),
@@ -253,9 +264,14 @@ export class PathToLinesClass {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#curve_commands
    * @see https://www.w3.org/TR/SVG/paths.html#PathDataCubicBezierCommands
    */
-  path_S() {
+  path_S(): void {
     // Match the first multiple of 4 in the line as it has a different form to the rest
     const smoothFirstMultiple = this.svgPath.match(new RegExp('[sS]' + pathFirst + pathRest.repeat(3)));
+
+    if (smoothFirstMultiple === null) {
+      console.error('Path S: smoothFirstMultiple is null');
+      return;
+    }
 
     // Cut the first multiple of 4 from the front of the line
     this.cutCharsFromFront(smoothFirstMultiple[0].length);
@@ -272,6 +288,10 @@ export class PathToLinesClass {
     for (let safetyBreak = 0; safetyBreak < 20; safetyBreak++) {
       try {
         const smoothMatches = this.svgPath.match(new RegExp('^' + pathRest.repeat(4)));
+        if (smoothMatches === null) {
+          console.error('Path S: smoothMatches is null');
+          break;
+        }
         this.cutCharsFromFront(smoothMatches[0].length);
         this.curveWriter(
           this.valueInMultipleMatches(smoothMatches, pathMatchesPerValue),
@@ -284,12 +304,7 @@ export class PathToLinesClass {
 
   }
 
-  /**
-   * @param {string[]} matches
-   * @param {number} matchesPerValue
-   * @returns {number[]}
-   */
-  valueInMultipleMatches(matches, matchesPerValue) {
+  valueInMultipleMatches(matches: string[], matchesPerValue: number): number[] {
     // console.log('matches', matches);
     const valueArr = [];
     for (let bushPig = 1; bushPig < matches.length; bushPig++) {
@@ -307,18 +322,15 @@ export class PathToLinesClass {
 
   /**
    * Remove strings from front of working SVG path
-   * @param {number} indexStart
    */
-  cutCharsFromFront(indexStart) {
+  cutCharsFromFront(indexStart: number) {
     this.svgPath = this.svgPath.substring(indexStart);
   }
 
   /**
    * Set the X and Y coordinates to use in relative calculations
-   * @param {number} [x=null]
-   * @param {number} [y=null]
    */
-  setCoordinates(x = null, y = null) {
+  setCoordinates(x: number|null = null, y: number|null = null) {
     if (x !== null) {
       this.x = fixFloatOverflow(x);
     }
@@ -330,7 +342,7 @@ export class PathToLinesClass {
   /**
    * Handle SVG close path z/Z
    */
-  path_Z() {
+  path_Z(): void {
     this.cutCharsFromFront(1);
     this.mxGraph += `<close/>\n`;
   }
