@@ -1,6 +1,6 @@
 {
   "name": "svg-to-stencil",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convert SVG paths to MXGraph syntax used in DrawIO stencils",
   "main": "src/app/index.ts",
   "author": "Leon Cilliers <phaze.phusion@gmail.com>",
