@@ -3,7 +3,7 @@ import {EngineClass} from "./classes/Engine.class";
 import {pickById} from "./shared/utlis";
 import {default as packageInfo} from '../../package.json';
 
-export const VERSION = packageInfo.version;
+const VERSION = packageInfo.version;
 const engine = new EngineClass();
 
 window.addEventListener('DOMContentLoaded', () => {

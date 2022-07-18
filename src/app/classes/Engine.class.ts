@@ -15,8 +15,12 @@ export class EngineClass {
 
   onConvert(): void {
     this._stencilForegroundContent = '';
+    let inputValue = (pickById('svg-in') as HTMLTextAreaElement).value;
 
-    parse((pickById('svg-in') as HTMLTextAreaElement).value)
+    // remove line breaks
+    inputValue = inputValue.replace(/\n+/g, ' ');
+
+    parse(inputValue)
       .then(
         (svgJsonObject: INode | INode[]) => {
 

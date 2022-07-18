@@ -27,34 +27,25 @@ export class PathToLinesClass {
 
   convert(): void {
     for (let safeBreak = 0; safeBreak < pathLengthLimit && this.svgPath.length > 0; safeBreak++) {
-      const char = this.svgPath[0];
-
-      this.isRelative = char.toLowerCase() === char;
+      const char = this.svgPath[0].toLowerCase();
+      this.isRelative = char === this.svgPath[0];
 
       switch (char) {
         // Move
-        case 'M': this.path_basic('m', false); break;
         case 'm': this.path_basic('m', false); break;
         // Line
-        case 'L': this.path_basic('l'); break;
         case 'l': this.path_basic('l'); break;
         // Horizontal line
-        case 'H': this.path_basic('h'); break;
         case 'h': this.path_basic('h'); break;
         // Vertical line
-        case 'V': this.path_basic('v'); break;
         case 'v': this.path_basic('v'); break;
         // Arc
-        case 'A': this.path_A(); break;
         case 'a': this.path_A(); break;
         // Cubic Curve
-        case 'C': this.path_C(); break;
         case 'c': this.path_C(); break;
         // Curve
-        case 'S': this.path_S(); break;
         case 's': this.path_S(); break;
         // End path
-        case 'Z':
         case 'z': this.path_Z(); break;
       }
 
