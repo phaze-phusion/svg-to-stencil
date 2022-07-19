@@ -10,11 +10,12 @@ export class EngineClass {
   // constructor() {
   // }
 
-  start(): void {
-    (pickById(elementId.convertButton) as HTMLButtonElement).addEventListener('click', this);
+  public start(): void {
+    this.onConvert = this.onConvert.bind(this);
+    (pickById(elementId.convertButton) as HTMLButtonElement).addEventListener('click', this.onConvert);
   }
 
-  onConvert(): void {
+  private onConvert(): void {
     this._stencilForegroundContent = '';
     let inputValue = (pickById(elementId.svgInput) as HTMLTextAreaElement).value;
 
@@ -56,11 +57,11 @@ export class EngineClass {
                   + `<fillstroke/>`;
                 break;
               }
-              case 'rect':
-              case 'ellipse':
-              case 'line':
-              case 'polyline':
-              case 'polygon':
+              // case 'rect':
+              // case 'ellipse':
+              // case 'line':
+              // case 'polyline':
+              // case 'polygon':
               default: console.error(`Engine doesn't yet cater for "${svgChild.name}"`, svgChild);
             }
 
@@ -81,13 +82,7 @@ export class EngineClass {
       );
   }
 
-  handleEvent(event: Event): void {
-    if (event.type === 'click') {
-      this.onConvert();
-    }
-  }
-
-  outputMxGraph(svgObject: INode): void {
+  private outputMxGraph(svgObject: INode): void {
     let stencilContent;
 
     if ((pickById(elementId.checkboxIncludeFull) as HTMLInputElement).checked) {
@@ -103,7 +98,7 @@ export class EngineClass {
       stencilContent = this._stencilForegroundContent;
     }
 
-    (pickById(elementId.stencilOutput) as HTMLTextAreaElement).textContent = stencilContent;
+    (pickById(elementId.stencilOutput) as HTMLTextAreaElement).value = stencilContent;
   }
 }
 

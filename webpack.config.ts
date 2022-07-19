@@ -32,6 +32,7 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
       extensions: ['.ts', '.js'],
     },
     stats: {
+      // errorDetails: true,
       children: true,
     },
     module: {
@@ -63,8 +64,8 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
                 sassOptions: {
                   outputStyle: 'expanded',
                   includePaths: [
-                    'src/styles.scss',
-                    'src/styles/'
+                    'src/scss.scss',
+                    'src/scss/'
                   ],
                 },
               },
