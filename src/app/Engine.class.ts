@@ -1,4 +1,4 @@
-import {PathToLinesClass} from "./PathToLinesClass";
+import {PathToLinesClass} from "./PathToLines.class";
 import {fixFloatOverflow, pickById} from "./shared/utlis";
 import {parse} from 'svgson';
 import {INode} from './models/INode.interface';

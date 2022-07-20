@@ -1,3 +1,4 @@
+import path from 'path';
 import {Configuration as WebpackConfiguration, WebpackPluginInstance} from 'webpack';
 import {Configuration as WebpackDevServerConfiguration} from 'webpack-dev-server';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
@@ -9,6 +10,8 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import StyleLintPlugin from 'stylelint-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import {default as npmPackage} from './package.json';
+
+/* global __dirname */
 
 interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
@@ -132,7 +135,7 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
   if (argv.mode === 'production') {
     config.output = {
       filename: `script.min.js`,
-      path: './dist/',
+      path: path.resolve(__dirname, './dist/'),
     };
 
     // https://webpack.js.org/configuration/performance/
