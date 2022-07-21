@@ -53,6 +53,43 @@ textarea {
   color: #fff;
 }
 
+.btn {
+  background-color: #111;
+  color: $color-primary;
+  border: 1px solid #393939;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: color 0.2s ease-out, background-color 0.2s ease-out;
+
+  > .material-icons {
+    display: inline-flex;
+    vertical-align: top;
+  }
+
+  > .btn-txt {
+    font-size: rem-font-size(14);
+    line-height: em-font-size(20);
+
+    + .material-icons {
+      font-size: em-font-size(20);
+      margin-left: 8px;
+    }
+  }
+
+  &:hover,
+  &:focus {
+    background-color: $color-primary;
+    color: #000;
+  }
+
+  &[disabled] {
+    background-color: #444;
+    color: #ddd;
+    border: 1px solid #303030;
+    cursor: not-allowed;
+  }
+}
+
 #svg-in {
   height: 100px;
 }
@@ -63,17 +100,35 @@ textarea {
 
 #convert-btn {
   width: 50%;
-  background-color: #111;
-  color: $color-primary;
-  border: 1px solid #393939;
   padding: 16px;
   margin: 16px 0;
-  cursor: pointer;
-  transition: color 0.2s ease-out, background-color 0.2s ease-out;
 
-  &:hover,
-  &:focus {
-    background-color: $color-primary;
-    color: #000;
+  .btn-txt {
+    font-size: rem-font-size(24);
+    line-height: em-font-size(28, 24);
+  }
+
+  .material-icons {
+    font-size: em-font-size(28);
   }
 }
+
+#svg-preview-container {
+  position: relative;
+}
+
+#svg-preview-btn {
+
+}
+
+#svg-preview-injection {
+  display: none;
+  position: absolute;
+  border: 1px solid #ccc;
+  background-color: #808080;
+
+  #svg-preview-container.preview-showing & {
+    display: block;
+  }
+}
+

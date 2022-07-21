@@ -22,9 +22,18 @@
       <label for="svg-in" class="help-text">paste SVG XML here</label>
     </div>
     <div class="area-r">
+      <div id="svg-preview-container">
+        <button id="svg-preview-btn" class="btn" disabled>
+          <span class="btn-txt">Preview SVG</span>
+          <span id="svg-preview-btn-icon" class="material-icons">expand_more</span>
+        </button>
+        <div id="svg-preview-injection"></div>
+      </div>
     </div>
   </div>
-  <button id="convert-btn" title="Click to convert"><span class="material-icons">arrow_downward</span></button>
+  <button id="convert-btn" class="btn" title="Click to convert">
+    <span class="btn-txt">Convert</span>
+    <span class="material-icons">arrow_downward</span></button>
   <h2>Stencil XML</h2>
   <div id="area-output" class="area-main">
     <div class="area-l">

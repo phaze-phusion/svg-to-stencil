@@ -17,3 +17,7 @@
 @function em-font-size($size, $base: $font-size-base-pixels) {
   @return math.div( strip-unit($size), strip-unit($base) ) * 1em;
 }
+
+@function rem-font-size($size) {
+  @return strip-unit( em-font-size($size) ) * 1rem;
+}

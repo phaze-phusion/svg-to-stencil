@@ -62,8 +62,28 @@ SVG TO TEST WITH
 
 <svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" version="1.1">
 <path class="p" stroke="#090" d="M50 50Q100-25 150 50Q200 125 250 50Q300-25 350 50Q400 125 450 50V75Q400 150 350 75Q300 0 250 75Q200 150 150 75Q100 0 50 75V50Z" />
-<path class="p" stroke="#009" d="M50 50Q100-25 150 50T250 50 350 50 450 50V75Q400 150 350 75T250 75 150 75 50 75 V50Z" />
-<path class="p" stroke="#909" d="M50 50q50-75 100 0q50 75 100 0q50-75 100 0q50 75 100 0v25q-50 75-100 0q-50-75-100 0q-50 75-100 0q-50-75-100 0v-25z" />
-<path class="p" stroke="#900" d="M50 50q50-75 100 0t100 0 100 0 100 0v25q-50 75-100 0t-100 0-100 0-100 0v-25z" />
+<path class="p" stroke="#009" transform="translate(0, 100)" d="M50 50Q100-25 150 50T250 50 350 50 450 50V75Q400 150 350 75T250 75 150 75 50 75 V50Z" />
+<path class="p" stroke="#909" transform="translate(0, 200)" d="M50 50q50-75 100 0q50 75 100 0q50-75 100 0q50 75 100 0v25q-50 75-100 0q-50-75-100 0q-50 75-100 0q-50-75-100 0v-25z" />
+<path class="p" stroke="#900" transform="translate(0, 300)" d="M50 50q50-75 100 0t100 0 100 0 100 0v25q-50 75-100 0t-100 0-100 0-100 0v-25z" />
 </svg>
 -->
+
+<!--
+TEST PREVIEW WITH
+
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<style type="text/css">
+  .p{fill:none; stroke-width:5;}
+  .e{fill:none; stroke-width:2; stroke: #666;}
+  .o{fill:none; stroke-width:1; stroke: #999;}
+</style>
+<path class="e" d="M0 100H500M0 200H500M0 300H500M0 400H500zM100 0V500M200 0V500M300 0V500M400 0V500Z" />
+<path class="o" d="M0 50H500M0 150H500M0 250H500M0 350H500M0 450H500zM50 0V500M150 0V500M250 0V500M350 0V500M450 0V500Z" />
+<path class="p" stroke="#090" d="M50 50Q100-25 150 50Q200 125 250 50Q300-25 350 50Q400 125 450 50V75Q400 150 350 75Q300 0 250 75Q200 150 150 75Q100 0 50 75V50Z" />
+<path class="p" stroke="#009" transform="translate(0, 100)" d="M50 50Q100-25 150 50T250 50 350 50 450 50V75Q400 150 350 75T250 75 150 75 50 75 V50Z" />
+<path class="p" stroke="#909" transform="translate(0, 200)" d="M50 50q50-75 100 0q50 75 100 0q50-75 100 0q50 75 100 0v25q-50 75-100 0q-50-75-100 0q-50 75-100 0q-50-75-100 0v-25z" />
+<path class="p" stroke="#900" transform="translate(0, 300)" d="M50 50q50-75 100 0t100 0 100 0 100 0v25q-50 75-100 0t-100 0-100 0-100 0v-25z" />
+</svg>
+-->
+
+
