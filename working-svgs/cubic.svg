@@ -1,0 +1,20 @@
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <style type="text/css">
+    .p{fill:none; stroke-width:5;}
+    .e{fill:none; stroke-width:2; stroke: #666;}
+    .o{fill:none; stroke-width:1; stroke: #999;}
+  </style>
+
+  <path class="e" d="M0 100H500M0 200H500M0 300H500M0 400H500zM100 0V500M200 0V500M300 0V500M400 0V500Z" />
+  <path class="o" d="M0 50H500M0 150H500M0 250H500M0 350H500M0 450H500zM50 0V500M150 0V500M250 0V500M350 0V500M450 0V500Z" />
+
+  <path class="p" stroke="#090"
+        d="M100 100 C100 200 250 200 250 100
+                    S400 0 400 100" />
+  <path class="p" stroke="#009" transform="translate(0, 50)"
+        d="M100 100 C100 200 250 200 250 100
+                    s150 -100 150 0" />
+  <path class="p" stroke="#909" transform="translate(0, 100)"
+        d="M100 100 C100 200 250 200 250 100
+                    c0 -100 150 -100 150 0" />
+</svg>

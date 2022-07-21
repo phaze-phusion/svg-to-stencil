@@ -1,6 +1,10 @@
 export class PathRegexClass {
   private static readonly pathFirst = '((-?\\.\\d+)|(-?\\d+\\.\\d+)|(-?\\d+))';
   private static readonly pathRest = '(([- ]?\\.\\d+)|([- ]\\d+\\.\\d+)|([- ]\\d+))';
+  private static readonly whitespaceFirst = '^(\\s+)?';
+  private static readonly noMoreNumbers = '^( ?[a-z])';
+  private static _leadingWhitespace: RegExp;
+  private static _nextIsALetter: RegExp;
   private static _lmLine: RegExp;
   private static _hvLine: RegExp;
   private static _cubic: RegExp;
@@ -12,6 +16,10 @@ export class PathRegexClass {
   private static _arc: RegExp;
 
   static {
+    PathRegexClass._leadingWhitespace = new RegExp(PathRegexClass.whitespaceFirst);
+
+    PathRegexClass._nextIsALetter = new RegExp(PathRegexClass.noMoreNumbers, 'i');
+
     PathRegexClass._lmLine = new RegExp(
       '^[lmLM]'
       + PathRegexClass.pathFirst
@@ -30,7 +38,7 @@ export class PathRegexClass {
     );
 
     PathRegexClass._cubicSmoothFirst = new RegExp(
-      '[sS]'
+      '^[sS]'
       + PathRegexClass.pathFirst
       + PathRegexClass.pathRest.repeat(3)
     );
@@ -43,18 +51,18 @@ export class PathRegexClass {
     PathRegexClass._quadratic = new RegExp(
       '^[qQ]'
       + PathRegexClass.pathFirst
-      + PathRegexClass.pathRest.repeat(2)
+      + PathRegexClass.pathRest.repeat(3)
     );
 
     PathRegexClass._quadraticSmoothFirst = new RegExp(
-      '[tT]'
+      '^[tT]'
       + PathRegexClass.pathFirst
-      + PathRegexClass.pathRest.repeat(3)
+      + PathRegexClass.pathRest
     );
 
     PathRegexClass._quadraticSmoothRest = new RegExp(
       '^'
-      + PathRegexClass.pathRest.repeat(4)
+      + PathRegexClass.pathRest.repeat(2)
     );
 
     PathRegexClass._arc = new RegExp(
@@ -69,6 +77,14 @@ export class PathRegexClass {
   // From the regex a value can come from N separate match indexes
   public static get matchesPerRegexValue() {
     return 4;
+  }
+
+  public static get leadingWhitespace() {
+    return PathRegexClass._leadingWhitespace;
+  }
+
+  public static get nextIsALetter() {
+    return PathRegexClass._nextIsALetter;
   }
 
   public static get lmLine(): RegExp {
