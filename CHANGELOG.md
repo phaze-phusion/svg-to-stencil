@@ -16,3 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README.md instructions and notes
 - Source converted to TypeScript
 - Simplify the switch statement in `PathToLineClass.convert`
+
+## [1.0.2] - 2019-07-21
+### Added
+- PathRegex.class.ts to hold all the many regex functions
+- `PathToLineClass` methods to draw quadratic curves
+
+### Changed
+- Source directory structure to somewhat match Angular
+- HTML element IDs are now stored in a separate enum
+- Introduced stricter Types, made possible by TypeScript
+- Renamed several methods to better describe their function
+- Use binding instead of `handleEvent()` to pass "this" context reference
