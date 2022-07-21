@@ -28,3 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Introduced stricter Types, made possible by TypeScript
 - Renamed several methods to better describe their function
 - Use binding instead of `handleEvent()` to pass "this" context reference
+
+## [1.0.3] - 2019-07-22
+### Added
+- SVG preview
+- RxJS package
+
+### Changed
+- Unwrapped `EngineClass` to form regular module called `interface.ts`
+- Move classes to components directory

@@ -2,7 +2,7 @@ import {parse} from 'svgson';
 import {fromEvent} from 'rxjs';
 import {default as packageInfo} from '../../package.json';
 import {INode} from './models/INode.interface';
-import {PathToLinesClass} from './PathToLines.class';
+import {PathToLinesClass} from './components/PathToLines.class';
 import {elementId} from './models/elementId.enum';
 import {fixFloatOverflow, pickById} from './shared/utlis';
 import {toggleListeningToPreviewBtn} from './svg-preview';

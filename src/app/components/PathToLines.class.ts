@@ -1,4 +1,4 @@
-import {fixFloatOverflow} from './shared/utlis';
+import {fixFloatOverflow} from '../shared/utlis';
 import {PathRegexClass} from './PathRegex.class';
 
 /*
