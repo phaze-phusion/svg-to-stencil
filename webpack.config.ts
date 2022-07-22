@@ -162,8 +162,7 @@ module.exports = (env: null, argv: { mode: 'none' | 'development' | 'production'
             mangle: {
               properties: {
                 // specify a list of names to be mangled with a regex
-                // regex: /(^_)|(^(internalMessage|classNames|highlight|keepOpen|hidden|invalid|serviceError|outOfService|disclaimer|cacheKey|i18n|dataBank)$)/,
-                regex: /^_/,
+                regex: /(^_)|(^app_|p_)/,
               },
             },
             // https://github.com/terser/terser#compress-options

@@ -33,6 +33,10 @@ Now your shape is ready to be added to the Scratchpad or a custom library.
 
 
 ## Wishlist for future versions
-- Show a preview of the uploaded SVG
-- Show a stencil compatibility score of the uploaded SVG
+- Add more SVG shapes:
+  - rect
+  - ellipse
+  - line
+  - polyline
+  - polygon
 - Instead of copying SVG XML make it a drag-drop file uploader
