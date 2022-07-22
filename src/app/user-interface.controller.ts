@@ -2,7 +2,7 @@ import {fromEvent} from 'rxjs';
 import {default as packageInfo} from '../../package.json';
 import {elementId} from './models/elementId.enum';
 import {pickById} from './shared/utlis';
-import {toggleListeningToPreviewBtn} from './svg-preview';
+import {toggleListeningToPreviewBtn} from './svg-preview.controller';
 import {SvgParserClass} from './components/SvgParser.class';
 
 const parser = new SvgParserClass();

@@ -1,6 +1,6 @@
 import {Observable, Subscriber} from 'rxjs';
 import {INode, parse} from 'svgson'; // eslint-disable-line import/named
-import {PathAttributes, CircleAttributes, SVGAttributes} from '../models/INode.interface';
+import {PathAttributes, CircleAttributes, SVGAttributes} from '../models/INodeAttributes';
 import {fixFloatOverflow} from '../shared/utlis';
 import {PathToLinesClass} from './PathToLines.class';
 

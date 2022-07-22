@@ -35,5 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RxJS package
 
 ### Changed
-- Unwrapped `EngineClass` to form regular module called `interface.ts`
+- Unwrapped `EngineClass` to form regular module called `user-interface.controller.ts`
 - Move classes to components directory
+
+## [1.0.4] - 2019-07-??
+### Changed
+- Split SVG Parser from user interface controller 
+- Improve build mangle setting for eventual smaller dist files
