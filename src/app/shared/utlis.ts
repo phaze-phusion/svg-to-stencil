@@ -1,4 +1,4 @@
-const precision = 1e2;
+import {options} from '../models/options.enum';
 
 export type Nullable<T> = T | null;
 
@@ -6,9 +6,6 @@ export function pickById(id: string): Nullable<HTMLElement> {
   return document.getElementById(id);
 }
 
-export function fixFloatOverflow(value: number): number {
-  if ((value + '').length > 15) {
-    value = Math.round(value * precision) / precision;
-  }
-  return value;
+export function floatPrecision(value: number): number {
+  return +value.toFixed(options.floatPrecision);
 }

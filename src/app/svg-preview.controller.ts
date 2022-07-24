@@ -1,12 +1,12 @@
 import {fromEvent, Subscription} from 'rxjs';
-import {pickById} from './shared/utlis';
+import {Nullable, pickById} from './shared/utlis';
 import {elementId} from './models/elementId.enum';
 
 let _previewContainer: HTMLDivElement;
 let _previewInjectionDiv: HTMLDivElement;
 let _previewButton: HTMLButtonElement;
 let _previewButtonIcon: HTMLSpanElement;
-let _previewBtnListener: Subscription | null = null;
+let _previewBtnListener: Nullable<Subscription> = null;
 
 export function initializePreview(): void {
   _previewButton = <HTMLButtonElement>pickById(elementId.previewBtn);
