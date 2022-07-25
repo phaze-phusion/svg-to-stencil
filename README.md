@@ -34,9 +34,6 @@ Now your shape is ready to be added to the Scratchpad or a custom library.
 
 ## Wishlist for future versions
 - Add more SVG shapes:
-  - rect
-  - ellipse
   - line
   - polyline
   - polygon
-- Instead of copying SVG XML make it a drag-drop file uploader

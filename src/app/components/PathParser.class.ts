@@ -11,10 +11,14 @@ export class PathParserClass {
 
   constructor(svgPath: string) {
     this._mxSection = new MxSectionClass();
-    this._parse(PathParserClass._splitPath( PathParserClass._normalizePath(svgPath) ));
+    const normalizedPath = PathParserClass._normalizePath(svgPath);
+    const splitPath = PathParserClass._splitPath(normalizedPath);
+    // console.log(splitPath);
+    this._parse(splitPath);
   }
 
   public get mxSection(): MxSectionClass {
+    // console.log(this._mxSection);
     return this._mxSection;
   }
 
@@ -134,7 +138,7 @@ export class PathParserClass {
     if (part.relative) {
       if (!isSmooth) {
         coords.x1 = this._addToX(coords.x1);
-        coords.y1 = this._addToX(coords.y1);
+        coords.y1 = this._addToY(coords.y1);
       }
       coords.x2 = this._addToX(coords.x2);
       coords.y2 = this._addToY(coords.y2);
@@ -201,7 +205,7 @@ export class PathParserClass {
     if (part.relative) {
       if (!isSmooth) {
         coords.x1 = this._addToX(coords.x1);
-        coords.y1 = this._addToX(coords.y1);
+        coords.y1 = this._addToY(coords.y1);
       }
       coords.x2 = this._addToX(coords.x2);
       coords.y2 = this._addToY(coords.y2);
@@ -294,7 +298,7 @@ export class PathParserClass {
       const charEnd = svgPath.slice(1).search(/[a-z]/i) + 1;
       const tmpPart = svgPath.substring(0, charEnd);
       const typeUppercase = tmpPart[0].toUpperCase();
-      const isRelative = typeUppercase === tmpPart[0];
+      const isRelative = typeUppercase !== tmpPart[0];
 
       parts.push(new PathPart(
         typeUppercase,
@@ -334,8 +338,8 @@ export class PathParserClass {
   private _addSmoothValues(isSmooth: boolean, values: number[]): number[] {
     if (isSmooth) {
       values = [
-        this._currentX * 2 - this._curveCenterX, // x1
-        this._currentY * 2 - this._curveCenterY, // y1
+        floatPrecision(this._currentX * 2 - this._curveCenterX), // x1
+        floatPrecision(this._currentY * 2 - this._curveCenterY), // y1
         ...values,
       ];
     }
