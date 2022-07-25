@@ -54,3 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Complicated regex to parse paths
+
+## [1.1.1] - 2022-07-??
+### Added
+- Closing of path by 'Z' command
+- Path calculation bugfixes

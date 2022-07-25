@@ -5,6 +5,8 @@ import {options} from '../models/options.enum';
 export class PathParserClass {
   private _currentX = 0;
   private _currentY = 0;
+  private _segmentStartX = 0;
+  private _segmentStartY = 0;
   private _curveCenterX = 0;
   private _curveCenterY = 0;
   private readonly _mxSection: MxSectionClass;
@@ -72,6 +74,11 @@ export class PathParserClass {
       }
     } else {
       throw new Error(`PathBasics error for '${part.type}'`);
+    }
+
+    if (part.type === 'M') {
+      this._segmentStartX = <number>x;
+      this._segmentStartY = <number>y;
     }
 
     this._setCoordinates(x, y);
@@ -271,6 +278,17 @@ export class PathParserClass {
    * Handle SVG close path z/Z
    */
   private _pathClose(): void {
+    if (this._segmentStartX !== this._currentX || this._segmentStartY !== this._currentY) {
+      // Close the path with a line
+      // this._pathBasics(new PathPart(
+      //   'L',
+      //   false,
+      //   [this._segmentStartX, this._segmentStartY]
+      // ));
+      // OR just update the current coordinates and let the drawing engine handle the joining line
+      this._setCoordinates(this._segmentStartX, this._segmentStartY);
+    }
+
     this._mxSection.appendPart(
       'close',
       {}
