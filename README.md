@@ -9,11 +9,11 @@ Convert SVG paths to MXGraph syntax used in DrawIO stencils
 ## How to use
 
 ### Using this app to create DrawIO Stencil XML
-1. Open an SVG in a text editor then select all the text and copy it
-2. Paste it in this app's "SVG XML" textarea
-3. Make sure the "include all stencil tags" checkbox is selected
-4. Click the big convert button
-5. Copy the output from the Stencil XML textarea
+1. Drag and drop an SVG file onto the input textarea  
+   Optional: One can also paste SVG XML in the input textarea
+2. Make sure the "include all stencil tags" checkbox is selected
+3. Click the big convert button
+4. Copy the output from the Stencil XML textarea
 
 ### Create a new DrawIO shape
 1. In DrawIO select Arrange > Insert > Shape
