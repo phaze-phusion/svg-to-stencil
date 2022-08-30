@@ -33,6 +33,9 @@ Now your shape is ready to be added to the Scratchpad or a custom library.
 
 
 ## Wishlist for future versions
+- Handle transform:translate with
+  - shapes
+  - paths
 - Add more SVG shapes:
   - line
   - polyline
