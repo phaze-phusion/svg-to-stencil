@@ -314,6 +314,8 @@ export class PathParserClass {
 
     for (let safetyStop = 0; safetyStop < options.pathLengthLimit && svgPath.length > 0; safetyStop++) {
       const charEnd = svgPath.slice(1).search(/[a-z]/i) + 1;
+      if (charEnd === 0)
+        continue;
       const tmpPart = svgPath.substring(0, charEnd);
       const typeUppercase = tmpPart[0].toUpperCase();
       const isRelative = typeUppercase !== tmpPart[0];
