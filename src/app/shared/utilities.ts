@@ -1,4 +1,4 @@
-import {options} from '../models/options.enum';
+import { Options } from '../models/options.const';
 
 export type Nullable<T> = T | null;
 
@@ -7,5 +7,5 @@ export function pickById(id: string): Nullable<HTMLElement> {
 }
 
 export function floatPrecision(value: number): number {
-  return +value.toFixed(options.floatPrecision);
+  return +value.toFixed(Options.FloatPrecision);
 }

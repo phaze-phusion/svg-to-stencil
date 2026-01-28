@@ -1,10 +1,17 @@
-import {Observable, Subscriber} from 'rxjs';
-import {INode, parse} from 'svgson'; // eslint-disable-line import/named
-import {PathAttributes, CircleAttributes, SVGAttributes, RectangleAttributes, RoundedRectangleAttributes, EllipseAttributes} from '../models/INodeAttributes';
-import {floatPrecision} from '../shared/utlis';
-import {PathParserClass} from './PathParser.class';
-import {MxSectionClass} from './MxSection.class';
-import {options} from '../models/options.enum';
+import { Observable, type Subscriber } from 'rxjs';
+import { type INode, parse } from 'svgson';
+import type {
+  CircleAttributes,
+  EllipseAttributes,
+  PathAttributes,
+  RectangleAttributes,
+  RoundedRectangleAttributes,
+  SVGAttributes
+} from '../models/INodeAttributes';
+import { Options } from '../models/options.const';
+import { floatPrecision } from '../shared/utilities';
+import { MxSectionClass } from './MxSection.class';
+import { PathParserClass } from './PathParser.class';
 
 export class SvgParserClass {
   public incFullMxGraphTags = false;
@@ -29,7 +36,7 @@ export class SvgParserClass {
               const svgChild = svgJson.children[waterBear];
               switch (svgChild.name) {
                 case 'style':
-                  console.info('Parser cannot parse Styles', svgChild);
+                  console.warn('Parser cannot parse Styles', svgChild);
                   break;
                 case 'path':
                   stencilContent += SvgParserClass._convertPath(<PathAttributes>svgChild.attributes);
@@ -122,7 +129,7 @@ export class SvgParserClass {
   private static _convertRectangle(attributes: RectangleAttributes | RoundedRectangleAttributes): string {
     const rectangle = new MxSectionClass();
     let type = 'rect';
-    const props: {w: number, h: number, x: number, y: number, arcsize?: number} = {
+    const props: { w: number, h: number, x: number, y: number, arcsize?: number } = {
       w: floatPrecision(+attributes.width),
       h: floatPrecision(+attributes.height),
       x: floatPrecision(+attributes.x),
@@ -154,7 +161,7 @@ export class SvgParserClass {
   private static _wrapInMxGraphTags(flag: boolean, attributes: SVGAttributes, stencilContent: string): string {
     if (flag) {
       const lineBreak = '\n';
-      const indent = options.indent;
+      const indent = Options.Indent;
       const breakIndent = lineBreak + indent;
       const breakIndent2 = lineBreak + indent + indent;
 

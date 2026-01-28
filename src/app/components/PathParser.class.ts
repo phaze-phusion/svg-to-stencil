@@ -1,6 +1,6 @@
-import {MxSectionClass} from './MxSection.class';
-import {Nullable, floatPrecision} from '../shared/utlis';
-import {options} from '../models/options.enum';
+import { Options } from '../models/options.const';
+import { type Nullable, floatPrecision } from '../shared/utilities';
+import { MxSectionClass } from './MxSection.class';
 
 export class PathParserClass {
   private _currentX = 0;
@@ -43,7 +43,7 @@ export class PathParserClass {
         //   this._removeWhitespace();
       }
 
-      if ((kangaroo + 1) === options.pathLengthLimit) {
+      if ((kangaroo + 1) === Options.PathLengthLimit) {
         console.warn('Path length limit reached');
       }
     }
@@ -133,7 +133,7 @@ export class PathParserClass {
   private _pathCubicCompiler(part: PathPart): void {
     const isSmooth = part.type === 'S';
     const values = this._addSmoothValues(isSmooth, part.values);
-    const coords: {x1: number, y1: number, x2: number, y2: number, x3: number, y3: number} = {
+    const coords: { x1: number, y1: number, x2: number, y2: number, x3: number, y3: number } = {
       x1: values[0],
       y1: values[1],
       x2: values[2],
@@ -202,7 +202,7 @@ export class PathParserClass {
   private _pathQuadCompiler(part: PathPart): void {
     const isSmooth = part.type === 'T';
     const values = this._addSmoothValues(isSmooth, part.values);
-    const coords: {x1: number, y1: number, x2: number, y2: number} = {
+    const coords: { x1: number, y1: number, x2: number, y2: number } = {
       x1: values[0],
       y1: values[1],
       x2: values[2],
@@ -312,7 +312,7 @@ export class PathParserClass {
   private static _splitPath(svgPath: string): PathPart[] {
     const parts: PathPart[] = [];
 
-    for (let safetyStop = 0; safetyStop < options.pathLengthLimit && svgPath.length > 0; safetyStop++) {
+    for (let safetyStop = 0; safetyStop < Options.PathLengthLimit && svgPath.length > 0; safetyStop++) {
       const charEnd = svgPath.slice(1).search(/[a-z]/i) + 1;
       if (charEnd === 0)
         continue;
@@ -341,7 +341,7 @@ export class PathParserClass {
   /**
    * Set the X and Y coordinates to use in relative calculations
    */
-  private _setCoordinates(x: Nullable<number> = null, y: Nullable<number> = null) {
+  private _setCoordinates(x: Nullable<number> = null, y: Nullable<number> = null): void {
     if (x !== null) {
       this._currentX = floatPrecision(x);
     }
@@ -350,7 +350,7 @@ export class PathParserClass {
     }
   }
 
-  private _setCurveCenter(x: number, y: number) {
+  private _setCurveCenter(x: number, y: number): void {
     this._curveCenterX = x;
     this._curveCenterY = y;
   }
@@ -384,7 +384,7 @@ class PathPart {
   }
 }
 
-class PathPartValues extends PathPart implements PathPart{
+class PathPartValues extends PathPart implements PathPart {
   constructor(
     parentPathPart: PathPart,
     values: number[]

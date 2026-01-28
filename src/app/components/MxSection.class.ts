@@ -1,13 +1,9 @@
-import {options} from '../models/options.enum';
+import { Options } from '../models/options.const';
 
 export class MxSectionClass {
-  private _sections: MxPart[];
+  private _sections: MxPart[] = [];
 
-  constructor() {
-    this._sections = [];
-  }
-
-  public appendPart(type: string, props: MxPartProperty) {
+  public appendPart(type: string, props: MxPartProperty): void {
     this._sections.push(
       new MxPart(
         type,
@@ -29,7 +25,7 @@ export class MxSectionClass {
 
     for (let siamese = 0; siamese < sections.length; siamese++) {
       const section: MxPart = sections[siamese];
-      tmpPath += options.indent + '<' + section.tag + MxSectionClass._writeAttributes(section) + ' />\n';
+      tmpPath += Options.Indent + '<' + section.tag + MxSectionClass._writeAttributes(section) + ' />\n';
     }
 
     tmpPath += after + '\n<fillstroke/>';

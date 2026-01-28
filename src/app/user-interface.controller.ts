@@ -1,10 +1,10 @@
-import {fromEvent} from 'rxjs';
-import {default as packageInfo} from '../../package.json';
-import {elementId} from './models/elementId.enum';
-import {pickById} from './shared/utlis';
-import {toggleListeningToPreviewBtn} from './svg-preview.controller';
-import {SvgParserClass} from './components/SvgParser.class';
-import {DropFileClass} from './components/DropFile.class';
+import { fromEvent } from 'rxjs';
+import { default as packageInfo } from '../../package.json';
+import { createDropAreas } from './components/DropFile.class';
+import { SvgParserClass } from './components/SvgParser.class';
+import { ElementId } from './models/elementId.const';
+import { pickById } from './shared/utilities';
+import { toggleListeningToPreviewBtn } from './svg-preview.controller';
 
 const parser = new SvgParserClass();
 let inputTextarea: HTMLTextAreaElement;
@@ -12,13 +12,13 @@ let outputTextarea: HTMLTextAreaElement;
 
 export function initializeInterface(): void {
   const VERSION = packageInfo.version;
-  (<HTMLSpanElement>pickById(elementId.appVersionOutput)).textContent = `v${VERSION}`;
-  inputTextarea = <HTMLTextAreaElement>pickById(elementId.svgInput);
-  outputTextarea = <HTMLTextAreaElement>pickById(elementId.stencilOutput);
+  (<HTMLSpanElement>pickById(ElementId.AppVersionOutput)).textContent = `v${VERSION}`;
+  inputTextarea = <HTMLTextAreaElement>pickById(ElementId.SvgInput);
+  outputTextarea = <HTMLTextAreaElement>pickById(ElementId.StencilOutput);
 
-  new DropFileClass(inputTextarea, outputTextarea);
+  createDropAreas(inputTextarea, outputTextarea);
 
-  fromEvent(<HTMLButtonElement>pickById(elementId.convertButton), 'click')
+  fromEvent(<HTMLButtonElement>pickById(ElementId.ConvertButton), 'click')
     .subscribe(
       () => {
         parseInput();
@@ -34,12 +34,12 @@ function parseInput(): void {
 
   toggleListeningToPreviewBtn(input);
 
-  parser.incFullMxGraphTags = (<HTMLInputElement>pickById(elementId.checkboxIncludeFull)).checked;
+  parser.incFullMxGraphTags = (<HTMLInputElement>pickById(ElementId.CheckboxIncludeFull)).checked;
 
   parser.app_convert(input)
     .subscribe(
       (outputContent: string) => {
-        (<HTMLTextAreaElement>pickById(elementId.stencilOutput)).value = outputContent;
+        (<HTMLTextAreaElement>pickById(ElementId.StencilOutput)).value = outputContent;
       }
     );
 }

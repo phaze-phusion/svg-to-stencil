@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.4] - 2022-07-??
 ### Changed
-- Split SVG Parser from user interface controller 
+- Split SVG Parser from user interface controller
 - Improve build mangle setting for eventual smaller dist files
 
 ## [1.1.0] - 2022-07-24
@@ -55,7 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Complicated regex to parse paths
 
-## [1.1.1] - 2022-07-??
-### Added
-- Closing of path by 'Z' command
-- Path calculation bugfixes
+## [1.2.0] - 2026-01-28
+### Changed
+- Convert project to use ESBuild instead of Webpack
+- Simplified the SCSS files
+- Update/fix the file-drop functionality

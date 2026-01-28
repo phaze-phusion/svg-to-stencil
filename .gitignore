@@ -12,21 +12,9 @@
 *.launch
 .settings/
 *.sublime-workspace
-*/*.iml
-*.iml
-
-# IDE - VSCode
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# misc
-*.zip
-*.log
-*.tgz
-.$*.bkp
+*.code-workspace
+.history/*
 
 # System Files
 .DS_Store

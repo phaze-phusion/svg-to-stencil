@@ -1,13 +1,9 @@
-@import 'modern-normalize/modern-normalize.css';
-@import './scss/variables';
-@import './scss/functions';
-@import './scss/mixins';
+@use 'scss/reset';
+@use 'sass:math';
 
-html,
-body {
-  font-family: $font-family-sans-serif;
-  background: #333;
-  color: #f7f7f7;
+:root {
+  --color-primary: hsl(15, 100%, 50%);
+  --font-family-mono: 'Source Code Pro', 'Roboto Slab', 'Courier', monospace;
 }
 
 main {
@@ -38,15 +34,15 @@ h3 {
 label {
   display: block;
   margin-bottom: 4px;
+}
 
-  &.help-text {
-    margin-top: 4px;
-    font-size: 0.8em;
-  }
+.help-text {
+  margin-top: 4px;
+  font-size: 0.8em;
 }
 
 textarea {
-  font-family: $font-family-mono;
+  font-family: var(--font-family-mono);
   width: 100%;
   background-color: #202020;
   border: 1px solid #444;
@@ -55,7 +51,7 @@ textarea {
 
 .btn {
   background-color: #111;
-  color: $color-primary;
+  color: var(--color-primary);
   border: 1px solid #393939;
   padding: 8px 16px;
   cursor: pointer;
@@ -67,18 +63,18 @@ textarea {
   }
 
   > .btn-txt {
-    font-size: rem-font-size(14);
-    line-height: em-font-size(20);
+    font-size: math.div(14, 16) * 1rem;
+    line-height: math.div(20, 14) * 1em;
 
     + .material-icons {
-      font-size: em-font-size(20);
+      font-size: math.div(20, 16) * 1rem;
       margin-left: 8px;
     }
   }
 
   &:hover,
   &:focus {
-    background-color: $color-primary;
+    background-color: var(--color-primary);
     color: #000;
   }
 
@@ -104,12 +100,12 @@ textarea {
   margin: 16px 0;
 
   .btn-txt {
-    font-size: rem-font-size(24);
-    line-height: em-font-size(28, 24);
+    font-size: math.div(24, 16) * 1rem;
+    line-height: math.div(28, 24) * 1em;
   }
 
   .material-icons {
-    font-size: em-font-size(28);
+    line-height: math.div(28, 16) * 1rem;
   }
 }
 
@@ -117,7 +113,7 @@ textarea {
   position: relative;
 }
 
-//#svg-preview-btn {}
+// #svg-preview-btn {}
 
 #svg-preview-injection {
   display: none;

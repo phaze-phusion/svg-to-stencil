@@ -1,7 +1,7 @@
 # SVG to Stencil
 Convert SVG paths to MXGraph syntax used in DrawIO stencils
 
-**Notes:**  
+**Notes:**<br>
 - Only simple monotone shapes are supported due to the limitations of DrawIO shapes (think clip-art)
 - SVGs containing groups `<g>`, definitions `<def>` or transform attributes are not supported.
 - Fill and stroke properties are not translated.
@@ -9,7 +9,7 @@ Convert SVG paths to MXGraph syntax used in DrawIO stencils
 ## How to use
 
 ### Using this app to create DrawIO Stencil XML
-1. Drag and drop an SVG file onto the input textarea  
+1. Drag and drop an SVG file onto the input textarea<br>
    Optional: One can also paste SVG XML in the input textarea
 2. Make sure the "include all stencil tags" checkbox is selected
 3. Click the big convert button
